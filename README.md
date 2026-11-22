@@ -88,6 +88,10 @@ reapply it: `docker compose down -v`, then `make up`.
 | `make test` | `pytest` |
 | `make eval-nace` | Score NACE families and append model calls to `ops.ai_log` |
 | `make healthcheck` | Fail if a source is stale or its kept volume drops by more than half |
+| `make metrics` | Write `docs/metrics.json` from the database, dbt and the NACE eval |
+| `make figures` | Write the presentation charts under `pictures/presentations/` |
+| `make dbt-docs` | Generate dbt docs and copy them to `docs/dbt/` |
+| `make slides-check` | Check the French decks against `docs/metrics.json` |
 
 ## Repo structure
 
@@ -98,6 +102,9 @@ reapply it: `docker compose down -v`, then `make up`.
 - `dbt/` — staging, marts, snapshot of `dim_enterprise`
 - `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`)
 - `scripts/healthcheck.py` — freshness and volume of the monitored sources
+- `scripts/export_metrics.py`, `make_figures.py`, `check-slides.py` — measured numbers, charts, deck checks
+- `docs/dbt/` — static dbt docs (`make dbt-docs`)
+- `docs/metrics.json` — measured counts, rejects, dbt tests and the NACE agreement
 - `.github/workflows/ci.yml` — ruff, ephemeral Postgres, dbt, pytest, mock AI
 - `brief/` — scope and specification (French)
 - `ROADMAP.md`, `JOURNAL.md` — plan and development log (French)
