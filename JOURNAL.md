@@ -48,3 +48,11 @@
 - `docs/metrics.json` mesuré : 38 communes, 300 établissements, 250 entreprises, avis `null`, rejets 0, tests dbt 61 réussis et 0 échoués, accord NACE 0,98 (49/50, 50 libellés non relus, 7 sous le seuil). L'exactitude d'extraction reste `null`.
 - Deux graphiques fond crème : population communale 2025, établissements synthétiques par famille. La doc dbt est copiée dans `docs/dbt/` (index, manifest, catalog).
 - `scripts/check-slides.py` et ses tests passent sur des decks fictifs (pytest 49). Sur les vrais decks FR, le contrôle échoue encore : ce sont les squelettes (cases 7 et 8). Decks EN non lus et non modifiés.
+
+## 2026-11-22 — Deck technique FR, projet A
+
+- 17 slides. Question : un établissement sans commune valide peut-il entrer dans le mart ? Ligne d'identité sous le titre. Les établissements sont nommés échantillon synthétique.
+- Chiffres repris de `docs/metrics.json` : 38 communes, 300 établissements, 250 entreprises, 61 tests dbt, accord 0,98 (49 sur 50, 50 non relus, 7 sous le seuil). Les avis restent non mesuré.
+- Les graphes sont servis depuis `docs/slides-assets` pour GitHub Pages. Le contrôle isolé du deck technique est vert. `python scripts/check-slides.py` échoue encore sur le squelette recruteur, laissé pour la case 8. Decks EN non modifiés.
+- `scripts/build-slides.sh` n'a pas pu joindre le registre npm (certificat). La même commande Marp, avec le CLI déjà installé, a produit le HTML sans erreur. Ce HTML n'est pas versionné : la CI le régénère.
+- Visuel non revu à l'œil après le déplacement des graphes sous `docs/slides-assets` : les deux slides `chart`. La couverture, elle, a été vue.

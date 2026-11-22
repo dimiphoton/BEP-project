@@ -1,3 +1,6 @@
 # Nombres autorisés dans les decks FR en plus de docs/metrics.json.
 # Une ligne, un jeton. Les lignes # sont ignorées.
 # Les années 2020–2030 sont déjà ignorées par le contrôle.
+# Hauteurs et largeurs d'image Marp, pas des mesures.
+460
+820
