@@ -1,0 +1,1 @@
+Classe le code NACE {nace_code} ({nace_label}) dans une seule famille de la liste : industrie, logistique, commerce, services, construction, autre.

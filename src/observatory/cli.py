@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import psycopg
+
 from observatory.config import Settings, ensure_dotenv
 from observatory.db import (
     EXPECTED_ROLES,
@@ -20,6 +22,13 @@ from observatory.db import (
 )
 from observatory.establishments import ESTABLISHMENT_SAMPLE, ingest_establishments
 from observatory.municipalities import ingest_population, resolve_population_source
+from observatory.nace import (
+    EVAL_SOURCE_NAME,
+    LiveProviderNotConfigured,
+    classify_loaded_enterprises,
+    evaluate_gold,
+    log_ai_calls,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +71,7 @@ def cmd_check(settings: Settings) -> int:
 
 
 def cmd_ingest(settings: Settings) -> int:
-    """Charge la population communale puis les établissements synthétiques.
+    """Charge communes et établissements, puis classe les codes NACE.
 
     Parameters
     ----------
@@ -97,6 +106,15 @@ def cmd_ingest(settings: Settings) -> int:
             logger.error("missing sample %s", ESTABLISHMENT_SAMPLE.as_posix())
             return 1
         establishments = ingest_establishments(connection, ESTABLISHMENT_SAMPLE)
+        try:
+            classified = classify_loaded_enterprises(
+                connection,
+                mode=settings.ai_mode,
+                threshold=settings.ai_confidence_threshold,
+            )
+        except (LiveProviderNotConfigured, FileNotFoundError, ValueError) as exc:
+            logger.error("%s", exc)
+            return 1
     logger.info(
         "loaded %s municipalities, rejected %s lines, source %s",
         result.loaded,
@@ -112,6 +130,67 @@ def cmd_ingest(settings: Settings) -> int:
     if establishments.loaded == 0:
         logger.error("no establishment was loaded")
         return 1
+    logger.info(
+        "classified %s nace codes, %s by rule, %s by ai, %s to review",
+        classified.codes,
+        classified.by_rule,
+        classified.by_ai,
+        classified.to_review,
+    )
+    if classified.codes == 0:
+        logger.error("no nace code was classified")
+        return 1
+    return 0
+
+
+def cmd_eval_nace(settings: Settings) -> int:
+    """Mesure l'accord du classeur avec le fichier d'évaluation.
+
+    Parameters
+    ----------
+    settings :
+        Mode d'IA, seuil, et mot de passe de ``ingest_rw`` pour le journal.
+
+    Returns
+    -------
+    int
+        0 si le score est calculé et les appels sont journalisés, 1 sinon.
+    """
+    settings.require("ingest_password")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        result = evaluate_gold(
+            mode=settings.ai_mode,
+            threshold=settings.ai_confidence_threshold,
+        )
+    except (LiveProviderNotConfigured, FileNotFoundError, ValueError) as exc:
+        logger.error("%s", exc)
+        return 1
+    if result.scored == 0:
+        logger.error("gold file has no row")
+        return 1
+    print(
+        f"nace agreement {result.agreement:.4f} "
+        f"({result.agreed}/{result.scored}); "
+        f"unverified labels {result.unverified}; "
+        f"below threshold {result.below_threshold}",
+        flush=True,
+    )
+    try:
+        with connect(
+            settings,
+            user=settings.ingest_user,
+            password=settings.ingest_password,
+        ) as connection:
+            logged = log_ai_calls(
+                connection,
+                result.predictions,
+                source_name=EVAL_SOURCE_NAME,
+            )
+    except psycopg.Error as exc:
+        logger.error("ai_log not written: %s", exc)
+        return 1
+    logger.info("appended %s ai calls to ops.ai_log", logged)
     return 0
 
 
@@ -150,8 +229,9 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("ensure-env", help="Create .env from .env.example when missing")
     sub.add_parser("check", help="List schemas and roles")
-    sub.add_parser("ingest", help="Check that ingest_rw can write raw and ops")
+    sub.add_parser("ingest", help="Load sources and classify NACE families")
     sub.add_parser("build", help="Run dbt build")
+    sub.add_parser("eval-nace", help="Score NACE families against the gold file")
     args = parser.parse_args()
 
     if args.command == "ensure-env":
@@ -165,6 +245,8 @@ def main() -> None:
         raise SystemExit(cmd_check(settings))
     if args.command == "ingest":
         raise SystemExit(cmd_ingest(settings))
+    if args.command == "eval-nace":
+        raise SystemExit(cmd_eval_nace(settings))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,51 @@
+nace_code,nace_label,activity_family,label_verified
+1011,Transformation et conservation de la viande,industrie,false
+1071,Fabrication de pain et de pâtisserie fraîche,industrie,false
+1105,Fabrication de bière,industrie,false
+1610,Sciage et rabotage du bois,industrie,false
+2013,Fabrication d'autres produits chimiques inorganiques de base,industrie,false
+2410,Sidérurgie,industrie,false
+2511,Fabrication de structures métalliques,industrie,false
+2811,Fabrication de moteurs et de turbines,industrie,false
+2910,Construction de véhicules automobiles,industrie,false
+3101,Fabrication de meubles de bureau et de magasin,industrie,false
+4120,Construction de bâtiments résidentiels et non résidentiels,construction,false
+4211,Construction de routes et autoroutes,construction,false
+4321,Travaux d'installation électrique,construction,false
+4399,Autres travaux de construction spécialisés,construction,false
+4511,Commerce de voitures et de véhicules automobiles légers,commerce,false
+4631,Commerce de gros de fruits et légumes,commerce,false
+4711,Commerce de détail en magasin non spécialisé à prédominance alimentaire,commerce,false
+4771,Commerce de détail d'habillement,commerce,false
+4941,Transports routiers de fret,logistique,false
+5010,Transports maritimes et côtiers de passagers,logistique,false
+5210,Entreposage et stockage,logistique,false
+5310,Activités de poste dans le cadre d'une obligation de service universel,logistique,false
+5510,Hôtels et hébergement similaire,services,false
+5610,Restaurants et services de restauration mobile,services,false
+5829,Édition d'autres logiciels,services,false
+6201,Programmation informatique,services,false
+6311,Traitement de données et hébergement,services,false
+6419,Autres intermédiations monétaires,services,false
+6820,Location et exploitation de biens immobiliers propres ou loués,services,false
+6920,Activités comptables,services,false
+7112,Activités d'ingénierie,services,false
+8121,Nettoyage courant des bâtiments,services,false
+0111,Culture de céréales (sauf le riz) et de légumineuses,autre,false
+0141,Élevage de vaches laitières,autre,false
+0210,Sylviculture et autres activités forestières,autre,false
+0510,Extraction de houille,autre,false
+0812,Exploitation de gravières et sablières,autre,false
+3511,Production d'électricité,industrie,false
+3600,Captage traitement et distribution d'eau,services,false
+3811,Collecte des déchets non dangereux,services,false
+3821,Traitement et élimination des déchets non dangereux,industrie,false
+8411,Administration publique générale,autre,false
+8520,Enseignement primaire,services,false
+8610,Activités hospitalières,services,false
+9001,Arts du spectacle vivant,services,false
+9311,Gestion d'installations sportives,services,false
+9602,Coiffure et soins de beauté,services,false
+9700,Activités des ménages employeurs de personnel domestique,autre,false
+0311,Pêche en mer,autre,false
+0729,Extraction d'autres minerais de métaux non ferreux,autre,false

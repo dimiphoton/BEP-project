@@ -32,3 +32,13 @@ sources:
           - name: enterprise_number
             tests:
               - not_null
+      - name: nace_activity
+        description: Famille d'activité d'un code NACE, règle ou cache mock.
+        columns:
+          - name: nace_code
+            tests:
+              - unique
+              - not_null
+          - name: activity_family
+            tests:
+              - not_null
