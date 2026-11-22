@@ -6,77 +6,85 @@
 | **Domain** | Economic development |
 | **Stack** | ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white) ![dbt](https://img.shields.io/badge/dbt-core-FF694B?logo=dbt&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white) |
 | **Level** | Intermediate |
-| **Status** | In progress |
+| **Status** | Demo |
 
-The Role · Domain · Stack line is filled from `brief/identite.md` at kickoff.
+The Role · Domain · Stack line is filled from `brief/identite.md`.
 
 ## Objective
 
 A small unified data platform for an intermunicipal economic-development
-agency in the Province of Namur. Two sources will land in one model:
+agency in the Province of Namur. Two sources land in one model:
 business-park establishments and public-procurement notices, linked by
-municipality (INS code) and enterprise (BCE number).
+municipality (INS code) and, when the evidence is strong enough, by
+enterprise (BCE number).
 
-The question the platform is built to answer: do the agency's public
-contracts, and those of its member municipalities, reach firms located in
-the province's business parks?
+The question: do the agency's public contracts, and those of its member
+municipalities, reach firms located in the province's business parks?
+
+This repository is a demo on a sample. It is not a production warehouse.
+
+## What was measured
+
+Counts below are copied from [`docs/metrics.json`](docs/metrics.json)
+(`generated_at` `2026-11-22T22:53:06+00:00`). Regenerate that file with
+`make metrics` after a fresh `make ingest` and `make build`. Do not treat
+a missing measure as zero: the file uses `null`.
+
+| | |
+|---|---|
+| Municipalities (real Statbel extract) | 38 |
+| Establishments / enterprises (synthetic) | 300 / 250 |
+| Loaded public contracts (synthetic) | 10 |
+| Contracts linked to a known enterprise | 8 |
+| Contract names waiting for a human | 1 |
+| Contract names with no link | 1 |
+| Linked firms that also have a site in the execution municipality | 0 |
+| NACE label agreement (draft labels) | 0.98 (49/50, none reviewed) |
+| Contract field accuracy (draft labels) | 0.9875 (79/80, none reviewed) |
+| dbt tests passed / failed | 88 / 0 |
+
+The zero on the same municipality is a result, not a missing table. The
+synthetic sites were placed on real Namur municipalities independently of
+the notices, so a linked firm is in the province and still not in the
+municipality where the contract is executed.
 
 ## Data
 
-Municipality population for the Province of Namur is a real Statbel extract,
-reference year 2025: [Population par lieu de résidence, nationalité, état civil, âge et sexe](https://statbel.fgov.be/fr/open-data/population-par-lieu-de-residence-nationalite-etat-civil-age-et-sexe-16)
+Municipality population is a real Statbel extract, reference year 2025:
+[Population par lieu de résidence, nationalité, état civil, âge et sexe](https://statbel.fgov.be/fr/open-data/population-par-lieu-de-residence-nationalite-etat-civil-age-et-sexe-16)
 (CC BY 4.0). The pipeline keeps province code `90000` and sums population
 over age, sex, nationality and marital status, one row per `nis_code`.
 
 The versioned extract is `data/sample/statbel_population_namur_2025.csv`.
 When `data/raw/TF_SOC_POP_STRUCT_2025.zip` is present, `make ingest` uses
-that file instead. The full zip is not committed.
+that file instead. The zip is not committed.
 
-Establishments are a synthetic sample, `data/sample/synthetic_establishments.csv`,
-labelled `synthetic_establishments`. BCE Open Data is not loaded: the
-official download asks for an account
+Establishments are `data/sample/synthetic_establishments.csv`, labelled
+`synthetic_establishments`. BCE Open Data is not loaded: the official
+download asks for an account
 ([BCE Open Data](https://kbopub.economie.fgov.be/kbo-open-data/login?lang=fr)).
-The 300 sites use real Namur municipality codes from the Statbel extract.
-Names, enterprise numbers and NACE codes in that file are generated, not
-observed. The activity family is assigned from the NACE code afterwards.
+Names, enterprise numbers and NACE codes in that file are generated. The
+activity family is assigned afterwards.
 
-Public-contract notices are a synthetic sample,
-`data/sample/synthetic_public_contracts.csv`, labelled
-`synthetic_public_contracts`. No TED or Walloon portal file is parsed:
-those formats were not read. A mock cache extracts each notice. One notice
-with a negative amount is quarantined. One notice under the confidence
-threshold waits in `ops.review_queue` and is not loaded. The loaded notices are tied to the execution municipality. A known
-enterprise number links at once. Otherwise the winner name is compared
-with rapidfuzz: a high score links, a middle score waits in
-`ops.review_queue`, a low score does not link. `mart_contracts_by_municipality`
-counts, per municipality, how many of those linked firms also have a site
-there.
+Public-contract notices are `data/sample/synthetic_public_contracts.csv`,
+labelled `synthetic_public_contracts`. No TED or Walloon portal file is
+parsed: those formats were not read, and no API layout was invented. A
+mock cache extracts each notice. A negative amount is quarantined. An
+extraction under the confidence threshold waits in `ops.review_queue` and
+is not loaded.
 
-## Result
+## How a notice meets a firm
 
-`dim_municipality` holds the Statbel 2025 population of the Province of Namur.
-`dim_enterprise` and `fact_establishment` hold the synthetic establishments,
-each tied to one of those municipalities. `fact_public_contract` holds the
-synthetic notices that passed extraction, each tied to its execution
-municipality. `enterprise_snapshot` keeps the
-enterprise name and NACE code over time.
+A known enterprise number links at once. Otherwise the winner name is
+normalised and compared with rapidfuzz. A high score links, a middle score
+waits for a person, a low score does not link. `mart_contracts_by_municipality`
+then counts, per execution municipality, how many linked firms also have
+a site there.
 
-Each NACE code is mapped to one activity family: industrie, logistique,
-commerce, services, construction, autre. A NACE section with a single family
-uses a rule. The other sections use the mock cache in `ai/cache/`
-(`AI_MODE=mock` by default). A cached answer under the confidence threshold
-goes to `ops.review_queue`. Every model call is appended to `ops.ai_log`.
-`make eval-nace` scores `data/eval/gold_nace.csv` (50 rows,
-`label_verified=false`: draft labels). `make eval-contracts` scores each
-extracted field of `data/eval/gold_contracts.csv` (10 notices, also
-`label_verified=false`). Live mode stops with an error until a provider
-is chosen.
-
-Each ingest step is appended to `ops.run_log` (start, end, rows read,
-rows rejected, status). `make healthcheck` fails when a monitored source
-has no recent success, or when the rows it kept fall by more than half
-compared with its previous success. The default freshness window is 7 days
-(`HEALTHCHECK_MAX_AGE_DAYS`).
+NACE families (industrie, logistique, commerce, services, construction,
+autre) use a rule when the NACE section has one family, and the mock cache
+otherwise. `AI_MODE=mock` is the default. `AI_MODE=live` stops with an
+error: no provider is configured. Gold files keep `label_verified=false`.
 
 ## Reproduce
 
@@ -86,6 +94,12 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
 make up
+make ingest
+make build
+make test
+make eval-nace
+make eval-contracts
+make healthcheck
 ```
 
 `make up` creates `.env` from `.env.example` when needed, starts Postgres,
@@ -99,40 +113,68 @@ reapply it: `docker compose down -v`, then `make up`.
 | Target | What it does |
 |---|---|
 | `make up` | Start Postgres and list schemas and roles |
-| `make ingest` | Load municipalities, establishments, then NACE families |
+| `make ingest` | Load municipalities, establishments, NACE families, notices, then enterprise links |
 | `make build` | `dbt build` (models, snapshot, tests) |
 | `make test` | `pytest` |
-| `make eval-nace` | Score NACE families and append model calls to `ops.ai_log` |
+| `make eval-nace` | Score NACE families and append those calls to `ops.ai_log` |
 | `make eval-contracts` | Score extracted contract fields and append those calls |
-| `make healthcheck` | Fail if a source is stale or its kept volume drops by more than half |
-| `make metrics` | Write `docs/metrics.json` from the database, dbt and the NACE eval |
-| `make figures` | Write the presentation charts under `pictures/presentations/` |
+| `make healthcheck` | Fail if a monitored source is stale or its kept volume drops by more than half |
+| `make metrics` | Rewrite `docs/metrics.json` from the database, dbt and the eval files |
+| `make figures` | Write the presentation charts and copy them to `docs/slides-assets/` |
 | `make dbt-docs` | Generate dbt docs and copy them to `docs/dbt/` |
 | `make slides-check` | Check the French decks against `docs/metrics.json` |
+
+## Limits of this demo
+
+- Population is real and limited to the Province of Namur. Establishments
+  and notices are synthetic and labelled as such.
+- Agreement scores are not a validated accuracy. The gold labels were not
+  reviewed (`label_verified=false`).
+- Invalid rows go to `ops.rejects` for the latest run of that source, not
+  as a permanent history. `ops.ai_log` is append-only. `ops.review_queue`
+  is replaced per source on each run.
+- `make healthcheck` watches pipeline runs (freshness and volume), not the
+  statistical reference year.
+- The CI workflow is in `.github/workflows/ci.yml` (ruff, Docker Compose
+  Postgres, dbt, pytest, mock AI, healthcheck). It has not been observed
+  on GitHub from this demo, because the branch was not pushed.
+- French slide sources are `docs/presentations/presentation-*-fr.md`.
+  The HTML committed under `docs/slides/` is still the portfolio template.
+  GitHub Actions rewrites it on a push that touches the presentations.
+  English decks were not written.
+- `scripts/build-slides.sh` calls `npx`. On this machine the npm registry
+  certificate check failed. The Marp CLI already installed locally did
+  build the decks. Those HTML files were not committed.
+
+## Not in this demo
+
+Orchestration with Airflow, change-data capture, and alerting are the
+production suite. Here, `ops.run_log`, `make healthcheck` and the CI
+workflow stand in for them. Enterprise history is a dbt snapshot on name
+and NACE code (check strategy), not a CDC stream.
 
 ## Repo structure
 
 - `db/init/` — schemas and roles, applied on the first database start
-- `data/sample/` — Statbel municipality extract and `synthetic_establishments`
-- `data/eval/` — draft NACE labels (`label_verified=false`)
-- `ai/` — prompt and mock cache
+- `data/sample/` — Statbel extract, synthetic establishments, synthetic notices
+- `data/eval/` — draft NACE labels and draft contract fields
+- `ai/` — prompts and mock caches
 - `dbt/` — staging, marts, snapshot of `dim_enterprise`
 - `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`, `eval-contracts`)
 - `scripts/healthcheck.py` — freshness and volume of the monitored sources
 - `scripts/export_metrics.py`, `make_figures.py`, `check-slides.py` — measured numbers, charts, deck checks
-- `docs/dbt/` — static dbt docs (`make dbt-docs`)
-- `docs/metrics.json` — measured counts, rejects, dbt tests and the NACE agreement
+- `docs/dbt/` — static dbt docs, including the contract mart (`make dbt-docs`)
+- `docs/metrics.json` — measured counts, rejects, dbt tests, eval scores and links
 - `.github/workflows/ci.yml` — ruff, ephemeral Postgres, dbt, pytest, mock AI
 - `brief/` — scope and specification (French)
-- `ROADMAP.md`, `JOURNAL.md` — plan and development log (French)
+- `ROADMAP.md`, `JOURNAL.md`, `docs/decisions.md` — plan, log and choices (French)
 
 ## Presentations
 
-Two audiences × two languages (Marp theme `portfolio`, HTML on GitHub Pages).
-The recruiter deck is a ~6-minute pitch; the technical deck is a ~12-minute
-deep dive. They may diverge a lot — the bar is attractive and informative
-for each audience, not a mirrored pair of slides.
+French sources, Marp theme `portfolio`:
 
-- Recruiter and technical decks in English: untouched, still the template.
-- [Présentation grand public (FR)](docs/slides/presentation-recruteur-fr.html) — project A, plain-language pitch.
-- [Présentation technique (FR)](docs/slides/presentation-technique-fr.html) — project A, measured figures.
+- [Recruiter (FR, markdown)](docs/presentations/presentation-recruteur-fr.md)
+- [Technical (FR, markdown)](docs/presentations/presentation-technique-fr.md)
+
+English decks are still the template. The HTML under `docs/slides/` is
+regenerated by CI and is not the source of the decks.
