@@ -1,0 +1,26 @@
+# Le script dans db/init ne s'exécute qu'à la création du volume.
+services:
+  postgres:
+    image: postgres:16
+    container_name: observatory-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-observatory}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_demo_only}
+      POSTGRES_DB: ${POSTGRES_DB:-observatory}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - observatory_pg:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  observatory_pg:
