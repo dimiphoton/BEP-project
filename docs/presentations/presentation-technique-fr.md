@@ -5,158 +5,201 @@ paginate: true
 ---
 
 <!-- _class: cover -->
-<!-- _paginate: false -->
 
-<!-- Photo : pictures/presentations/photos/hero.png -->
-<!-- ![bg brightness:0.40](../../pictures/presentations/photos/hero.png) -->
+# Un établissement sans commune valide peut-il entrer dans le mart ?
 
-# [Question de recherche]
-# en une assertion
+Data engineering · Développement économique · Python / PostgreSQL / dbt
 
-[Métier] · [Domaine] · [Stack]
+Province de Namur · 2024-2026
 
-Wallonie · période · grain des données
-
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/motivation.png) -->
-
-# [Pourquoi
-# mesurer ça.]
-
-[Enjeu chiffré si on l'a. Coût d'une mauvaise décision.]
-
-**[Ce qui manque aujourd'hui pour trancher.]**
-
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/hero.png) -->
-
-# [Qui consomme
-# le résultat.]
-
-[Agence / régulateur]. [Opérateur / assureur / bureau d'études].
-
-Le livrable : [indicateur, vue, reco], pas un rapport.
+Les établissements sont un échantillon synthétique.
 
 ---
 
 <!-- _class: full -->
 
-<!-- ![bg brightness:0.38](../../pictures/presentations/photos/physique.png) -->
+# Deux sources séparées ne répondent pas à la question.
 
-# [Mécanisme.]
+L'intercommunale veut savoir où sont les sites.
 
-[Physique ou processus : pluie → saturé → rendement, courbe de charge, Espec…]
+Le code INS de la commune est le lien.
 
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/motivation.png) -->
-
-# [Logique du
-# traitement.]
-
-Sources. Grain. Unités. Jointures.
-
-Ce qu'on agrège, ce qu'on ne mélange pas.
-
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/physique.png) -->
-
-# [Ce qu'on isole.]
-
-On retire [confondant]. Ce qui reste, c'est [cible].
-
-Pas [ce qu'on ne prétend pas].
-
----
-
-<!-- _class: dark -->
-
-# Périmètre.
-
-On fait [orientation : diagnostic / identifiability / décision].
-
-On n'est pas [scénario 2050 / modèle tape-à-l'œil / carte sans fond].
-
----
-
-<!-- _class: chart -->
-
-[Baseline / tendance / donnée brute — titre-phrase.]
-
-<!-- ![w:920](../../pictures/presentations/baseline-fr.png) -->
+Sans lui, le parc et le territoire restent côte à côte.
 
 ---
 
 <!-- _class: full -->
 
-<!-- ![bg brightness:0.38](../../pictures/presentations/photos/physique.png) -->
+# Trois acteurs lisent le même modèle.
 
-# [Résultat principal]
-# [métrique + n]
+L'intercommunale prépare les parcs.
 
----
+Les communes adhérentes portent les sites.
 
-<!-- _class: chart -->
-
-[Graphe de *ce* récit technique — pas forcément celui du deck RH.]
-
-<!-- ![w:980](../../pictures/presentations/graphique-cle-fr.png) -->
+L'entreprise est le grain à reconnaître.
 
 ---
 
-<!-- _class: split -->
+<!-- _class: full -->
 
-<!-- ![bg left:40%](../../pictures/presentations/photos/hero.png) -->
+# Une ligne part du fichier et arrive au modèle unifié.
 
-# [Robustesse.]
+La source est lue, puis validée.
 
-[Spatial / années / n]. [Ce qui n'est pas indépendant.]
+Le brut reste brut.
 
-<!-- ![w:480](../../pictures/presentations/carte-ou-robustesse-fr.png) -->
+dbt seul produit la commune, l'entreprise, l'établissement.
 
 ---
 
-<!-- _class: chart -->
+<!-- _class: actions -->
 
-Pourquoi pas [modèle tape-à-l'œil] ? n = […]. [Modèle retenu + validation.]
+# Le flux tient en quatre gestes.
 
-<!-- ![w:640](../../pictures/presentations/validation-fr.png) -->
+- Population communale réelle, une ligne par code INS
+- Établissements : un échantillon synthétique
+- Ligne invalide en quarantaine, le reste continue
+- dbt relie le site à la commune déjà connue
+
+---
+
+<!-- _class: full -->
+
+# La relation vers la commune est un test.
+
+0 ligne refusée sur les deux chargements.
+
+61 tests dbt réussissent.
+
+0 test échoue.
 
 ---
 
 <!-- _class: dark -->
 
-# Où ça casse.
+# Le périmètre s'arrête au projet A.
 
-[Limite 1.]
+On garantit le rattachement établissement, entreprise, commune.
 
-[Limite 2.]
+On n'ingère pas les avis de marché.
 
-[Limite 3. Corrélation ≠ cause si pertinent.]
+Ce volume reste non mesuré.
+
+---
+
+<!-- _class: chart -->
+
+# La population 2025 se lit commune par commune.
+
+![h:460 Population communale](../slides-assets/municipality_population.png)
+
+---
+
+<!-- _class: full -->
+
+# 300 établissements tiennent sur 38 communes.
+
+250 entreprises portent ces sites.
+
+Certaines en ont un second : le fait n'est pas la dimension.
+
+Aucun site ne pointe hors du référentiel.
+
+---
+
+<!-- _class: chart -->
+
+# La famille est déduite du code, pas observée sur le terrain.
+
+![w:820 Familles d'activité](../slides-assets/establishments_by_family.png)
+
+---
+
+<!-- _class: full -->
+
+# La BCE ne se télécharge pas sans compte.
+
+Aucun parseur n'a été inventé pour un format non lu.
+
+À la place, un échantillon synthétique, étiqueté comme tel.
+
+Les codes INS, eux, viennent du fichier Statbel.
+
+---
+
+<!-- _class: full -->
+
+# La règle classe. Le cache ne répond que dans le silence.
+
+L'accord est de 0,98 sur 50 libellés.
+
+49 concordent. Ces 50 libellés ne sont pas relus.
+
+7 réponses sous le seuil vont en revue.
+
+---
+
+<!-- _class: full -->
+
+# Le nom et le code NACE laissent une trace.
+
+Le snapshot compare ces deux colonnes.
+
+La source n'apporte pas d'horodatage.
+
+On historise par contrôle, pas par une date inventée.
+
+---
+
+<!-- _class: full -->
+
+# Ce qui a cassé a été corrigé, pas contourné.
+
+Le schéma dbt ne préfixe plus les noms du socle.
+
+Un Postgres local occupait déjà le port : le conteneur écoute à côté.
+
+Le journal de passage retient le succès, pas seulement le fichier.
+
+---
+
+<!-- _class: dark -->
+
+# Les limites tiennent en trois lignes.
+
+Les établissements restent un échantillon synthétique.
+
+Les 50 libellés de famille ne sont pas relus.
+
+Les avis de marché restent non mesuré.
+
+---
+
+<!-- _class: actions -->
+
+# Lundi, l'intercommunale pourrait s'en servir.
+
+- Voir quelles communes concentrent les établissements
+- Relire les réponses de famille encore en revue
+- Rejouer un chargement sans doubler les sites
+- Brancher les marchés plus tard, encore non mesuré
 
 ---
 
 <!-- _class: cta -->
 
-<!-- ![bg brightness:0.30](../../pictures/presentations/photos/cta.png) -->
+# On rejoue le socle, puis on lit la doc.
 
-# Reproduire.
+[Documentation dbt](../dbt/index.html)
 
-[Explorer en ligne](../explore-fr.html)
+[Dépôt](https://github.com/dimiphoton/BEP-project)
 
-`python -m mon_projet run`
+`make up`
 
-`python -m mon_projet dashboard`
+`make ingest`
 
-<!-- Badges de stack ici, pas en slide 1 recruteur. -->
+`make build`
+
+`make test`
+
+Python · PostgreSQL · dbt · Docker

@@ -116,6 +116,6 @@ The recruiter deck is a ~6-minute pitch; the technical deck is a ~12-minute
 deep dive. They may diverge a lot — the bar is attractive and informative
 for each audience, not a mirrored pair of slides.
 
-- Recruiter and technical decks in English: coming soon.
-- [Présentation grand public (FR)](docs/slides/presentation-recruteur-fr.html)
-- [Présentation technique (FR)](docs/slides/presentation-technique-fr.html)
+- Recruiter and technical decks in English: untouched, still the template.
+- [Présentation grand public (FR)](docs/slides/presentation-recruteur-fr.html) — still the template.
+- [Présentation technique (FR)](docs/slides/presentation-technique-fr.html) — project A, measured figures.
