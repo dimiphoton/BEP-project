@@ -117,5 +117,5 @@ deep dive. They may diverge a lot — the bar is attractive and informative
 for each audience, not a mirrored pair of slides.
 
 - Recruiter and technical decks in English: untouched, still the template.
-- [Présentation grand public (FR)](docs/slides/presentation-recruteur-fr.html) — still the template.
+- [Présentation grand public (FR)](docs/slides/presentation-recruteur-fr.html) — project A, plain-language pitch.
 - [Présentation technique (FR)](docs/slides/presentation-technique-fr.html) — project A, measured figures.

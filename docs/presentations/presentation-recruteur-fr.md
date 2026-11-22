@@ -5,131 +5,148 @@ paginate: true
 ---
 
 <!-- _class: cover -->
-<!-- _paginate: false -->
 
-<!-- Photo : pictures/presentations/photos/hero.png -->
-<!-- ![bg brightness:0.40](../../pictures/presentations/photos/hero.png) -->
+# Sait-on dans quelle commune se trouve chaque site ?
 
-# [Question humaine]
-# sur deux ou trois
-# lignes ?
+Data engineering · Développement économique
 
-[Métier] · [Domaine] · [Stack]
+Province de Namur · 2024-2026
 
-Wallonie · période
-
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/motivation.png) -->
-
-# [Pourquoi
-# maintenant.]
-
-[Enjeu humain ou économique, en une phrase.]
-
-**[Ce qui se joue si on ne fait rien.]**
-
----
-
-<!-- _class: split -->
-
-<!-- ![bg left:46%](../../pictures/presentations/photos/hero.png) -->
-
-# [Qui doit
-# s'en servir.]
-
-[Agence / administration]. [Entreprise / opérateur]. [Autre acteur].
-
-**[La décision qu'ils ont à prendre.]**
+Les sites sont un échantillon synthétique.
 
 ---
 
 <!-- _class: full -->
 
-<!-- ![bg brightness:0.38](../../pictures/presentations/photos/physique.png) -->
+# Sans commune, un parc n'est qu'une liste de noms.
 
-# [La physique
-# en clair.]
+L'intercommunale doit pouvoir dire où sont les sites.
 
-[Mécanisme réel, sans équation : trop d'eau, trop de chaleur, un trou le soir…]
+Une commune adhérente doit s'y reconnaître.
+
+Deux fichiers posés côte à côte ne répondent pas.
 
 ---
 
-<!-- _class: split -->
+<!-- _class: full -->
 
-<!-- ![bg left:46%](../../pictures/presentations/photos/motivation.png) -->
+# Trois interlocuteurs partagent la même liste.
 
-# [Comment on
-# lit les chiffres.]
+L'intercommunale prépare les parcs.
 
-D'où ça vient. À quelle maille.
+Les communes adhérentes accueillent les sites.
 
-Ce qu'on transforme pour que le chiffre veuille dire quelque chose.
+Les entreprises sont celles qu'il faudra reconnaître ensuite.
+
+---
+
+<!-- _class: full -->
+
+# Un site n'est publié qu'une fois rattaché.
+
+On lit d'abord les communes, avec leur population.
+
+On lit ensuite les sites.
+
+Une ligne qui ne tient pas est écartée. Le reste continue.
+
+---
+
+<!-- _class: full -->
+
+# Le territoire est réel. Les sites ne le sont pas.
+
+Les 38 communes viennent du fichier public de population.
+
+Les 300 sites ont été fabriqués pour la démonstration.
+
+On ne les lit pas comme une observation du terrain.
 
 ---
 
 <!-- _class: dark -->
 
-# Ce projet, ce n'est pas.
+# On situe les sites. On ne tranche pas les marchés.
 
-Pas [non-objectif 1].
+Chaque site publié a une commune.
 
-Pas [non-objectif 2].
+La question des marchés publics reste ouverte.
 
-**[Ce qu'on vise à la place.]**
+Ce volume est non mesuré.
 
 ---
 
 <!-- _class: full -->
 
-<!-- ![bg brightness:0.38](../../pictures/presentations/photos/physique.png) -->
+# 300 sites, et aucun sans commune.
 
-# [Punchline.]
-# [Un chiffre.]
+Ils reposent sur les 38 communes de la province.
+
+Une adresse fausse ne passe pas.
+
+Le fichier, lui, n'est pas jeté pour autant.
 
 ---
 
 <!-- _class: chart -->
 
-[Titre-phrase : le graphe que *ce* public doit retenir.]
+# Les sites fabriqués se regroupent en quelques activités.
 
-<!-- ![w:980](../../pictures/presentations/graphique-cle-fr.png) -->
+![w:820 Familles d'activité](../slides-assets/establishments_by_family.png)
 
 ---
 
-<!-- _class: split -->
+<!-- _class: full -->
 
-<!-- ![bg left:40%](../../pictures/presentations/photos/hero.png) -->
+# Ce n'est pas encore une réponse sur les marchés.
 
-# [Ce n'est pas
-# un artefact.]
+Les noms d'entreprises sont fabriqués.
 
-<!-- ![w:480](../../pictures/presentations/carte-ou-robustesse-fr.png) -->
+L'activité vient d'une règle, pas d'une visite sur place.
+
+Les avis publics restent non mesuré.
+
+---
+
+<!-- _class: full -->
+
+# Le registre officiel des entreprises demande un compte.
+
+On n'a pas inventé de fichier à sa place.
+
+Les sites sont donc un échantillon synthétique.
+
+Les communes, elles, viennent d'une source publique.
+
+---
+
+<!-- _class: dark -->
+
+# Les limites tiennent en trois phrases.
+
+Les sites restent un échantillon synthétique.
+
+Les activités proposées n'ont pas été relues.
+
+Le lien avec les marchés reste non mesuré.
 
 ---
 
 <!-- _class: actions -->
 
-<!-- ![bg right:38%](../../pictures/presentations/photos/action.png) -->
+# Lundi, l'intercommunale pourrait s'en servir.
 
-# Lundi.
-
-**[Cible A]** — [geste concret].
-
-**[Cible B]** — [geste concret].
-
-Pas une cause unique. Un faisceau d'indices.
+- Dire à une commune quels sites de l'échantillon elle porte
+- Relire les 7 cas encore douteux
+- Rejouer le chargement sans compter deux fois le même site
+- Laisser les marchés pour plus tard : non mesuré
 
 ---
 
 <!-- _class: cta -->
 
-<!-- ![bg brightness:0.30](../../pictures/presentations/photos/cta.png) -->
+# La suite se lit dans la documentation.
 
-# À vous.
+[Documentation](../dbt/index.html)
 
-[Ouvrir le tableau de bord](../explore-fr.html)
-
-[Code source](https://github.com/dimiphoton/mon-projet)
+[Dépôt](https://github.com/dimiphoton/BEP-project)
