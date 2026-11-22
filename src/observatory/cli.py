@@ -34,6 +34,8 @@ from observatory.db import (
     list_schemas,
     missing_names,
 )
+from observatory.entities import SOURCE_NAME as ENTITY_SOURCE
+from observatory.entities import link_loaded_contracts
 from observatory.establishments import (
     ESTABLISHMENT_SAMPLE,
     ingest_establishments,
@@ -252,6 +254,29 @@ def cmd_ingest(settings: Settings) -> int:
             rows_rejected=rejected,
             status=contract_status,
         )
+        entity_run = start_run(connection, ENTITY_SOURCE)
+        try:
+            entity_counts = link_loaded_contracts(connection)
+        except (psycopg.Error, ValueError) as exc:
+            logger.error("%s", exc)
+            finish_run(
+                connection,
+                entity_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
+            return 1
+        entity_read = sum(entity_counts.values())
+        entity_status = "success" if entity_read > 0 else "failed"
+        # Pas de lien n'est pas un rejet : le volume suivi est le nombre d'avis.
+        finish_run(
+            connection,
+            entity_run,
+            rows_read=entity_read,
+            rows_rejected=0,
+            status=entity_status,
+        )
     logger.info(
         "loaded %s municipalities, rejected %s lines, source %s",
         result.loaded,
@@ -285,6 +310,15 @@ def cmd_ingest(settings: Settings) -> int:
     )
     if loaded == 0:
         logger.error("no public contract was loaded")
+        return 1
+    logger.info(
+        "linked %s contracts, %s to review, %s unmatched",
+        entity_counts["linked"],
+        entity_counts["review"],
+        entity_counts["unmatched"],
+    )
+    if entity_read == 0:
+        logger.error("no contract was resolved")
         return 1
     return 0
 

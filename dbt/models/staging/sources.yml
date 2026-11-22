@@ -32,6 +32,19 @@ sources:
           - name: enterprise_number
             tests:
               - not_null
+      - name: contract_enterprise_link
+        description: Décision de lien entre un avis et une entreprise.
+        columns:
+          - name: notice_id
+            tests:
+              - unique
+              - not_null
+          - name: status
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ["linked", "review", "unmatched"]
       - name: public_contract
         description: Avis synthétiques extraits par le cache mock.
         columns:

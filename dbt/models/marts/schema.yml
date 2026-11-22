@@ -59,6 +59,24 @@ models:
         tests:
           - not_null
 
+  - name: mart_contracts_by_municipality
+    description: Avis par commune d'exécution, et ceux liés à une entreprise du référentiel.
+    columns:
+      - name: nis_code
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_municipality')
+                field: nis_code
+      - name: contract_count
+        tests:
+          - not_null
+      - name: linked_count
+        tests:
+          - not_null
+
   - name: fact_public_contract
     description: Avis rattachés à la commune d'exécution. Pas encore à l'entreprise.
     columns:

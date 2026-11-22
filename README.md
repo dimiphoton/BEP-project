@@ -45,8 +45,12 @@ Public-contract notices are a synthetic sample,
 `synthetic_public_contracts`. No TED or Walloon portal file is parsed:
 those formats were not read. A mock cache extracts each notice. One notice
 with a negative amount is quarantined. One notice under the confidence
-threshold waits in `ops.review_queue` and is not loaded. The loaded notices
-are tied to the execution municipality only, not yet to an enterprise.
+threshold waits in `ops.review_queue` and is not loaded. The loaded notices are tied to the execution municipality. A known
+enterprise number links at once. Otherwise the winner name is compared
+with rapidfuzz: a high score links, a middle score waits in
+`ops.review_queue`, a low score does not link. `mart_contracts_by_municipality`
+counts, per municipality, how many of those linked firms also have a site
+there.
 
 ## Result
 

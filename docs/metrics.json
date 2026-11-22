@@ -11,7 +11,7 @@
     "synthetic_public_contracts": 1
   },
   "dbt": {
-    "passed": 75,
+    "passed": 88,
     "failed": 0
   },
   "ai": {
@@ -26,10 +26,16 @@
     "extraction_unverified": 10,
     "extraction_below_threshold": 1
   },
+  "links": {
+    "linked": 8,
+    "review": 1,
+    "unmatched": 1,
+    "same_municipality": 0
+  },
   "data_origin": {
     "municipalities": "real",
     "establishments": "synthetic",
     "public_contracts": "synthetic"
   },
-  "generated_at": "2026-11-22T22:42:39+00:00"
+  "generated_at": "2026-11-22T22:53:06+00:00"
 }

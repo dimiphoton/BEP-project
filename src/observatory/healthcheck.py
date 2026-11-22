@@ -16,6 +16,7 @@ import psycopg
 from observatory.config import Settings, ensure_dotenv
 from observatory.contracts import SOURCE_NAME as CONTRACT_SOURCE
 from observatory.db import PgConnection, connect
+from observatory.entities import SOURCE_NAME as ENTITY_SOURCE
 from observatory.establishments import SOURCE_NAME as ESTABLISHMENT_SOURCE
 from observatory.municipalities import SOURCE_NAME as MUNICIPALITY_SOURCE
 from observatory.nace import SOURCE_NAME as NACE_SOURCE
@@ -26,6 +27,7 @@ MONITORED_SOURCES = (
     ESTABLISHMENT_SOURCE,
     NACE_SOURCE,
     CONTRACT_SOURCE,
+    ENTITY_SOURCE,
 )
 DEFAULT_MAX_AGE_DAYS = 7
 # Moins de la moitié du volume précédent : la chute dépasse 50 %.
