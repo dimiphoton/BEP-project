@@ -69,3 +69,8 @@
 - 12 avis synthétiques. 10 sont chargés dans `fact_public_contract`, chacun sur une commune réelle. 1 extraction au montant négatif est refusée. 1 avis sous le seuil (montant faux dans le cache) attend en revue et n'est pas chargé.
 - Exactitude par champ : 0,9875, soit 79 champs sur 80. Les 10 libellés ne sont pas relus. Le lien par l'entreprise n'est pas fait.
 - pytest 54. `make healthcheck` affiche `ok`. Tests dbt : 75 réussis, 0 échoué. Decks FR ajustés là où ils disaient encore que les avis n'étaient pas mesurés. Decks EN non modifiés. La doc dbt n'a pas été régénérée.
+
+## 2026-11-22 — Lien par l'entreprise
+
+- Sur 10 avis chargés : 8 liés (numéro connu ou nom identique), 1 nom proche en revue, 1 nom éloigné sans lien. `mart_contracts_by_municipality` mesure 0 site dans la commune d'exécution.
+- pytest 59. Healthcheck `ok`. Tests dbt : 88 réussis, 0 échoué. Decks FR mis à jour, graphe des trois issues inclus. Decks EN non modifiés. La doc dbt n'a pas été régénérée. Le graphe a été vu. Les slides rendues, non.

@@ -69,7 +69,7 @@ dbt seul produit la commune, l'entreprise, l'établissement.
 
 0 ligne refusée sur les deux chargements.
 
-75 tests dbt réussissent.
+88 tests dbt réussissent.
 
 0 test échoue.
 
@@ -77,13 +77,21 @@ dbt seul produit la commune, l'entreprise, l'établissement.
 
 <!-- _class: dark -->
 
-# Dix avis sont rattachés à leur commune.
+# Huit avis retrouvent une entreprise connue.
 
-10 avis synthétiques ont une commune d'exécution.
+10 avis ont une commune. 8 sont liés.
 
-Le lien avec l'entreprise n'est pas fait.
+1 nom proche attend. 1 nom éloigné ne lie pas.
 
-L'établissement, lui, reste sur sa commune.
+Aucun de ces sites n'est dans la commune de l'avis.
+
+---
+
+<!-- _class: chart -->
+
+# Le lien à l'entreprise se lit en trois issues.
+
+![w:820 Liens aux entreprises](../slides-assets/contracts_by_link.png)
 
 ---
 
@@ -171,7 +179,7 @@ Les établissements restent un échantillon synthétique.
 
 Les 50 libellés de famille ne sont pas relus.
 
-Les avis ne sont pas encore liés à une entreprise.
+Le lien ne place pas le site dans la commune de l'avis.
 
 ---
 
@@ -182,7 +190,7 @@ Les avis ne sont pas encore liés à une entreprise.
 - Voir quelles communes concentrent les établissements
 - Relire les réponses de famille encore en revue
 - Rejouer un chargement sans doubler les sites
-- Relier ensuite l'avis à l'entreprise, ce n'est pas fait
+- Relire le nom encore douteux avant de le compter
 
 ---
 

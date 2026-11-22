@@ -119,11 +119,45 @@ def family_rows(connection: PgConnection) -> list[tuple[str, int]]:
     return [(str(family), int(sites)) for family, sites in rows]
 
 
+def link_rows(connection: PgConnection) -> list[tuple[str, int]]:
+    """Compte les avis liés, à relire, ou sans lien.
+
+    Parameters
+    ----------
+    connection :
+        Connexion qui lit ``raw``.
+
+    Returns
+    -------
+    list[tuple[str, int]]
+        Trois issues, dans un ordre fixe. Vide si la table n'existe pas.
+    """
+    found = connection.execute(
+        "SELECT to_regclass('raw.contract_enterprise_link')"
+    ).fetchone()
+    if found is None or found[0] is None:
+        return []
+    rows = connection.execute(
+        """
+        SELECT status, count(*)
+        FROM raw.contract_enterprise_link
+        GROUP BY status
+        """
+    ).fetchall()
+    totals = {str(status): int(total) for status, total in rows}
+    labels = (
+        ("linked", "lié"),
+        ("review", "à relire"),
+        ("unmatched", "sans lien"),
+    )
+    return [(label, totals.get(status, 0)) for status, label in labels]
+
+
 def write_figures(
     connection: PgConnection,
     directory: Path = FIGURES_DIR,
 ) -> list[Path]:
-    """Écrit les deux graphiques utilisés plus tard dans les decks.
+    """Écrit les graphiques utilisés dans les decks.
 
     Parameters
     ----------
@@ -161,4 +195,16 @@ def write_figures(
         xlabel="Établissements",
         path=family_path,
     )
-    return [population_path, family_path]
+    written = [population_path, family_path]
+    links = link_rows(connection)
+    if links:
+        link_path = directory / "contracts_by_link.png"
+        save_bars(
+            [label for label, _total in links],
+            [total for _label, total in links],
+            title="Avis synthétiques selon le lien à l'entreprise",
+            xlabel="Avis",
+            path=link_path,
+        )
+        written.append(link_path)
+    return written

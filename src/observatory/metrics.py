@@ -109,6 +109,7 @@ def collect_metrics(connection: PgConnection) -> dict:
             "extraction_unverified": contracts.unverified,
             "extraction_below_threshold": contracts.below_threshold,
         },
+        "links": _link_counts(connection),
         "data_origin": {
             "municipalities": "real",
             "establishments": "synthetic",
@@ -143,6 +144,43 @@ def _count_relation(connection: PgConnection, qualified: str) -> int | None:
     if row is None:
         return None
     return int(row[0])
+
+
+def _link_counts(connection: PgConnection) -> dict[str, int | None]:
+    """Compte les décisions de lien. Table absente : ``null``, pas zéro."""
+    empty = {
+        "linked": None,
+        "review": None,
+        "unmatched": None,
+        "same_municipality": None,
+    }
+    found = connection.execute(
+        "SELECT to_regclass('raw.contract_enterprise_link')"
+    ).fetchone()
+    if found is None or found[0] is None:
+        return empty
+    counts = {"linked": 0, "review": 0, "unmatched": 0}
+    rows = connection.execute(
+        """
+        SELECT status, count(*)
+        FROM raw.contract_enterprise_link
+        GROUP BY status
+        """
+    ).fetchall()
+    for status, total in rows:
+        if status in counts:
+            counts[status] = int(total)
+    same = connection.execute(
+        "SELECT to_regclass('marts.mart_contracts_by_municipality')"
+    ).fetchone()
+    if same is None or same[0] is None:
+        counts["same_municipality"] = None
+        return counts
+    row = connection.execute(
+        "SELECT coalesce(sum(same_municipality_count), 0) FROM marts.mart_contracts_by_municipality"
+    ).fetchone()
+    counts["same_municipality"] = 0 if row is None else int(row[0])
+    return counts
 
 
 def _reject_counts(connection: PgConnection) -> dict[str, int]:

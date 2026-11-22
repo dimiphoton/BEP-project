@@ -1,6 +1,17 @@
 version: 2
 
 models:
+  - name: stg_contract_enterprise
+    description: Lien avis-entreprise, tel que déposé dans raw.
+    columns:
+      - name: notice_id
+        tests:
+          - unique
+          - not_null
+      - name: status
+        tests:
+          - not_null
+
   - name: stg_public_contract
     description: Avis extraits, tels que déposés dans raw.
     columns:

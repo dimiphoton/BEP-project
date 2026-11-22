@@ -66,13 +66,21 @@ On ne les lit pas comme une observation du terrain.
 
 <!-- _class: dark -->
 
-# On situe les sites, et aussi les avis.
+# Huit avis retrouvent une entreprise du fichier.
 
-Chaque site publié a une commune.
+10 avis ont une commune.
 
-10 avis synthétiques aussi.
+Un nom proche reste à relire. Un nom éloigné ne lie pas.
 
-Le lien entre l'avis et l'entreprise n'est pas fait.
+Aucun site lié n'est dans la commune de l'avis.
+
+---
+
+<!-- _class: chart -->
+
+# Le lien à l'entreprise se voit d'un coup d'œil.
+
+![w:820 Liens aux entreprises](../slides-assets/contracts_by_link.png)
 
 ---
 
@@ -128,7 +136,7 @@ Les sites restent un échantillon synthétique.
 
 Les activités proposées n'ont pas été relues.
 
-Les avis ne sont pas encore liés à une entreprise.
+Le site lié n'est pas dans la commune de l'avis.
 
 ---
 
@@ -139,7 +147,7 @@ Les avis ne sont pas encore liés à une entreprise.
 - Dire à une commune quels sites de l'échantillon elle porte
 - Relire les 7 cas encore douteux
 - Rejouer le chargement sans compter deux fois le même site
-- Relier ensuite l'avis à l'entreprise, ce n'est pas fait
+- Relire le nom encore douteux avant de le compter
 
 ---
 

@@ -12,5 +12,5 @@ Détails et critères dans `brief/specification.md`.
 - [x] 7 — Présentation technique FR v1 (16–18 slides, projet A seul). `check-slides.py` vert et `scripts/build-slides.sh` sans erreur.
 - [x] 8 — Présentation recruteur FR v1 (12–14 slides). Mêmes contrôles.
 - [x] 9 — Marchés publics (projet B) : ingestion des avis, extraction IA structurée, `fact_public_contract`, lien par la commune, évaluation sur 10 avis.
-- [ ] 10 — Lien par l'entreprise : résolution d'entités, `ops.review_queue`, `mart_contracts_by_municipality` ; mise à jour des 2 présentations FR.
+- [x] 10 — Lien par l'entreprise : résolution d'entités, `ops.review_queue`, `mart_contracts_by_municipality` ; mise à jour des 2 présentations FR.
 - [ ] 11 — `README.md` (anglais, branche dédiée), `CHANGELOG.md`, `docs/decisions.md`, limites assumées et suite prévue (Airflow, CDC, alerting).
