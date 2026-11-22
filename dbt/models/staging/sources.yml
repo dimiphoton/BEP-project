@@ -12,3 +12,23 @@ sources:
             tests:
               - unique
               - not_null
+      - name: enterprise
+        description: Entreprises de l'échantillon synthétique.
+        columns:
+          - name: enterprise_number
+            tests:
+              - unique
+              - not_null
+      - name: establishment
+        description: Établissements synthétiques rattachés à une commune.
+        columns:
+          - name: establishment_number
+            tests:
+              - unique
+              - not_null
+          - name: nis_code
+            tests:
+              - not_null
+          - name: enterprise_number
+            tests:
+              - not_null
