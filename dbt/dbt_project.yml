@@ -11,4 +11,11 @@ clean-targets:
   - target
   - dbt_packages
 
-# Pas de modèle à cette étape. Les dossiers models/ préparent staging et marts.
+models:
+  observatory:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table

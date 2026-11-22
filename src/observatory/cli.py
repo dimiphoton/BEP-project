@@ -18,6 +18,7 @@ from observatory.db import (
     list_schemas,
     missing_names,
 )
+from observatory.municipalities import ingest_population, resolve_population_source
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +61,7 @@ def cmd_check(settings: Settings) -> int:
 
 
 def cmd_ingest(settings: Settings) -> int:
-    """Vérifie que le rôle d'ingestion peut écrire dans raw et ops.
-
-    Aucune source n'est branchée à cette étape.
+    """Charge la population communale, après avoir vérifié le rôle d'écriture.
 
     Parameters
     ----------
@@ -72,10 +71,15 @@ def cmd_ingest(settings: Settings) -> int:
     Returns
     -------
     int
-        0 si les privilèges sont en place, 1 sinon.
+        0 si au moins une commune est chargée, 1 sinon.
     """
     settings.require("ingest_password")
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        source = resolve_population_source()
+    except FileNotFoundError as exc:
+        logger.error("%s", exc)
+        return 1
     with connect(
         settings,
         user=settings.ingest_user,
@@ -84,7 +88,16 @@ def cmd_ingest(settings: Settings) -> int:
         if not ingest_can_write(connection):
             logger.error("ingest_rw cannot create objects in raw and ops")
             return 1
-    logger.info("ingest_rw can write raw and ops; no source is configured yet")
+        result = ingest_population(connection, source)
+    logger.info(
+        "loaded %s municipalities, rejected %s lines, source %s",
+        result.loaded,
+        result.rejected,
+        result.source.as_posix(),
+    )
+    if result.loaded == 0:
+        logger.error("no municipality was loaded")
+        return 1
     return 0
 
 

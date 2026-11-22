@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: dim_municipality
+    description: Communes de la province de Namur et leur population.
+    columns:
+      - name: nis_code
+        tests:
+          - unique
+          - not_null
+      - name: municipality_name
+        tests:
+          - not_null
+      - name: province_nis_code
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["90000"]
+      - name: population
+        tests:
+          - not_null
+      - name: reference_year
+        tests:
+          - not_null
