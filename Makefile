@@ -11,7 +11,7 @@ else
   PY ?= $(VENV_PY)
 endif
 
-.PHONY: up ingest build test eval-nace healthcheck
+.PHONY: up ingest build test eval-nace healthcheck metrics figures dbt-docs slides-check
 
 up:
 	$(PY) -m observatory.cli ensure-env
@@ -32,3 +32,15 @@ eval-nace:
 
 healthcheck:
 	$(PY) scripts/healthcheck.py
+
+metrics:
+	$(PY) scripts/export_metrics.py
+
+figures:
+	$(PY) scripts/make_figures.py
+
+dbt-docs:
+	$(PY) scripts/export_dbt_docs.py
+
+slides-check:
+	$(PY) scripts/check-slides.py

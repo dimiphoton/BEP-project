@@ -1,0 +1,30 @@
+{
+  "counts": {
+    "municipalities": 38,
+    "establishments": 300,
+    "enterprises": 250,
+    "public_contracts": null
+  },
+  "rejects": {
+    "statbel_tf_soc_pop_struct_2025": 0,
+    "synthetic_establishments": 0
+  },
+  "dbt": {
+    "passed": 61,
+    "failed": 0
+  },
+  "ai": {
+    "nace_agreement": 0.98,
+    "nace_agreed": 49,
+    "nace_scored": 50,
+    "nace_unverified": 50,
+    "nace_below_threshold": 7,
+    "extraction_field_accuracy": null
+  },
+  "data_origin": {
+    "municipalities": "real",
+    "establishments": "synthetic",
+    "public_contracts": null
+  },
+  "generated_at": "2026-11-22T22:07:35+00:00"
+}

@@ -42,3 +42,9 @@
 - `make healthcheck` affiche `ok`. Il échoue si le dernier passage n'est pas un succès, s'il a plus de 7 jours, ou si le volume gardé chute de plus de la moitié du succès précédent. Garder exactement la moitié passe encore.
 - pytest 37. La CI (`.github/workflows/ci.yml`) enchaîne ruff, `make up`, ingest, dbt, pytest, `eval-nace` en `AI_MODE=mock`, puis le healthcheck. Elle n'a pas été observée sur GitHub : rien n'est poussé.
 - Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.
+
+## 2026-11-22 — Outillage des présentations
+
+- `docs/metrics.json` mesuré : 38 communes, 300 établissements, 250 entreprises, avis `null`, rejets 0, tests dbt 61 réussis et 0 échoués, accord NACE 0,98 (49/50, 50 libellés non relus, 7 sous le seuil). L'exactitude d'extraction reste `null`.
+- Deux graphiques fond crème : population communale 2025, établissements synthétiques par famille. La doc dbt est copiée dans `docs/dbt/` (index, manifest, catalog).
+- `scripts/check-slides.py` et ses tests passent sur des decks fictifs (pytest 49). Sur les vrais decks FR, le contrôle échoue encore : ce sont les squelettes (cases 7 et 8). Decks EN non lus et non modifiés.
