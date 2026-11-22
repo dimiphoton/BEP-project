@@ -56,3 +56,10 @@
 - Les graphes sont servis depuis `docs/slides-assets` pour GitHub Pages. Le contrôle isolé du deck technique est vert. `python scripts/check-slides.py` échoue encore sur le squelette recruteur, laissé pour la case 8. Decks EN non modifiés.
 - `scripts/build-slides.sh` n'a pas pu joindre le registre npm (certificat). La même commande Marp, avec le CLI déjà installé, a produit le HTML sans erreur. Ce HTML n'est pas versionné : la CI le régénère.
 - Visuel non revu à l'œil après le déplacement des graphes sous `docs/slides-assets` : les deux slides `chart`. La couverture, elle, a été vue.
+
+## 2026-11-22 — Deck recruteur FR
+
+- 13 slides. Question : sait-on dans quelle commune se trouve chaque site ? Métier et domaine sous le titre, sans badges. Les sites sont nommés échantillon synthétique.
+- Chiffres repris de `docs/metrics.json` : 38 communes, 300 sites, 7 cas encore douteux. Les marchés restent non mesuré. Le graphe est celui des familles d'activité.
+- `python scripts/check-slides.py` est vert sur les deux decks FR. Decks EN non modifiés.
+- `scripts/build-slides.sh` échoue encore au certificat npm. Le HTML a été produit par le CLI Marp déjà installé, puis retiré du suivi : la CI le régénère. Visuel non revu à l'œil : l'ensemble du deck recruteur, y compris la slide du graphe.

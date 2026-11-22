@@ -10,3 +10,4 @@
 - Exploitation : `ops.run_log`, `make healthcheck` (source périmée ou volume gardé en chute de plus de 50 %), CI avec Postgres éphémère et `AI_MODE=mock`.
 - Outillage des présentations : `docs/metrics.json`, graphiques, documentation dbt, contrôle `scripts/check-slides.py`. Les decks eux-mêmes restent le squelette.
 - Deck technique FR, projet A : question sur le rattachement à la commune, chiffres lus dans `docs/metrics.json`.
+- Deck recruteur FR : même périmètre, en langage clair. Les marchés restent non mesurés.
