@@ -19,3 +19,11 @@
 - dbt : `staging.stg_municipality`, `marts.dim_municipality`, tests `unique`, `not_null`, `accepted_values` et code INS de la province.
 - Extrait versionné : `data/sample/statbel_population_namur_2025.csv`. Le zip complet reste dans `data/raw/`, hors git.
 - Présentations non mises à jour : les decks FR sont les cases 7 et 8, et aucun chiffre ne s'écrit sans `docs/metrics.json` (case 6). Decks EN inchangés.
+
+## 2026-11-22 — Établissements synthétiques
+
+- La BCE Open Data demande un compte : pas de fichier anonyme, donc pas de parseur BCE. Échantillon `synthetic_establishments`, 300 établissements et 250 entreprises, codes INS réels des 38 communes.
+- Upsert sur le numéro d'établissement et le numéro d'entreprise. Une commune inconnue ou une clé BCE fausse part dans `ops.rejects`.
+- dbt : `dim_enterprise`, `fact_establishment`, snapshot `enterprise_snapshot` (stratégie check). Le test de relation vers `dim_municipality` passe : aucun établissement sans commune valide.
+- `make ingest build test` vert (dbt PASS=53, pytest 24).
+- Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.

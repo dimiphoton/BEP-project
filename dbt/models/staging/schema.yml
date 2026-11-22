@@ -23,3 +23,42 @@ models:
       - name: reference_year
         tests:
           - not_null
+
+  - name: stg_enterprise
+    description: Entreprises brutes, une ligne par numéro BCE.
+    columns:
+      - name: enterprise_number
+        tests:
+          - unique
+          - not_null
+      - name: enterprise_name
+        tests:
+          - not_null
+      - name: nace_code
+        tests:
+          - not_null
+
+  - name: stg_establishment
+    description: Établissements bruts, grain un site.
+    columns:
+      - name: establishment_number
+        tests:
+          - unique
+          - not_null
+      - name: enterprise_number
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_enterprise')
+                field: enterprise_number
+      - name: nis_code
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_municipality')
+                field: nis_code
+      - name: establishment_name
+        tests:
+          - not_null

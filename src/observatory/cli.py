@@ -18,6 +18,7 @@ from observatory.db import (
     list_schemas,
     missing_names,
 )
+from observatory.establishments import ESTABLISHMENT_SAMPLE, ingest_establishments
 from observatory.municipalities import ingest_population, resolve_population_source
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ def cmd_check(settings: Settings) -> int:
 
 
 def cmd_ingest(settings: Settings) -> int:
-    """Charge la population communale, après avoir vérifié le rôle d'écriture.
+    """Charge la population communale puis les établissements synthétiques.
 
     Parameters
     ----------
@@ -71,7 +72,7 @@ def cmd_ingest(settings: Settings) -> int:
     Returns
     -------
     int
-        0 si au moins une commune est chargée, 1 sinon.
+        0 si les communes et les établissements sont chargés, 1 sinon.
     """
     settings.require("ingest_password")
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -89,14 +90,27 @@ def cmd_ingest(settings: Settings) -> int:
             logger.error("ingest_rw cannot create objects in raw and ops")
             return 1
         result = ingest_population(connection, source)
+        if result.loaded == 0:
+            logger.error("no municipality was loaded")
+            return 1
+        if not ESTABLISHMENT_SAMPLE.exists():
+            logger.error("missing sample %s", ESTABLISHMENT_SAMPLE.as_posix())
+            return 1
+        establishments = ingest_establishments(connection, ESTABLISHMENT_SAMPLE)
     logger.info(
         "loaded %s municipalities, rejected %s lines, source %s",
         result.loaded,
         result.rejected,
         result.source.as_posix(),
     )
-    if result.loaded == 0:
-        logger.error("no municipality was loaded")
+    logger.info(
+        "loaded %s establishments, rejected %s lines, source %s",
+        establishments.loaded,
+        establishments.rejected,
+        establishments.source.as_posix(),
+    )
+    if establishments.loaded == 0:
+        logger.error("no establishment was loaded")
         return 1
     return 0
 

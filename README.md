@@ -32,16 +32,20 @@ The versioned extract is `data/sample/statbel_population_namur_2025.csv`.
 When `data/raw/TF_SOC_POP_STRUCT_2025.zip` is present, `make ingest` uses
 that file instead. The full zip is not committed.
 
-No other source is loaded yet. Planned coverage for the rest of the
-observatory: Province of Namur, sample years 2024–2026. If a later public
-file cannot be downloaded, that step will switch to a synthetic sample
-labelled `synthetic_*`.
+Establishments are a synthetic sample, `data/sample/synthetic_establishments.csv`,
+labelled `synthetic_establishments`. BCE Open Data is not loaded: the
+official download asks for an account
+([BCE Open Data](https://kbopub.economie.fgov.be/kbo-open-data/login?lang=fr)).
+The 300 sites use real Namur municipality codes from the Statbel extract.
+Names, enterprise numbers and NACE codes in that file are generated, not
+observed.
 
 ## Result
 
-PostgreSQL 16 is up with schemas `raw`, `staging`, `marts` and `ops`, and
-three roles (`ingest_rw`, `dbt_rw`, `reader_ro`). Ingestion and marts come
-in the next steps. `dbt build` runs, with no model yet.
+`dim_municipality` holds the Statbel 2025 population of the Province of Namur.
+`dim_enterprise` and `fact_establishment` hold the synthetic establishments,
+each tied to one of those municipalities. `enterprise_snapshot` keeps the
+enterprise name and NACE code over time.
 
 ## Reproduce
 
@@ -64,14 +68,15 @@ reapply it: `docker compose down -v`, then `make up`.
 | Target | What it does |
 |---|---|
 | `make up` | Start Postgres and list schemas and roles |
-| `make ingest` | Load Statbel municipality population into `raw` |
-| `make build` | `dbt build` (no model at this step) |
+| `make ingest` | Load municipalities, then the synthetic establishments |
+| `make build` | `dbt build` (models, snapshot, tests) |
 | `make test` | `pytest` |
 
 ## Repo structure
 
 - `db/init/` — schemas and roles, applied on the first database start
-- `dbt/` — dbt project (models arrive with the municipality dimension)
+- `data/sample/` — Statbel municipality extract and `synthetic_establishments`
+- `dbt/` — staging, marts, snapshot of `dim_enterprise`
 - `src/observatory/` — CLI (`check`, `ingest`, `build`)
 - `brief/` — scope and specification (French)
 - `ROADMAP.md`, `JOURNAL.md` — plan and development log (French)
