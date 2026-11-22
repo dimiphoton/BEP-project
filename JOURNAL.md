@@ -63,3 +63,9 @@
 - Chiffres repris de `docs/metrics.json` : 38 communes, 300 sites, 7 cas encore douteux. Les marchés restent non mesuré. Le graphe est celui des familles d'activité.
 - `python scripts/check-slides.py` est vert sur les deux decks FR. Decks EN non modifiés.
 - `scripts/build-slides.sh` échoue encore au certificat npm. Le HTML a été produit par le CLI Marp déjà installé, puis retiré du suivi : la CI le régénère. Visuel non revu à l'œil : l'ensemble du deck recruteur, y compris la slide du graphe.
+
+## 2026-11-22 — Avis de marchés, lien par la commune
+
+- 12 avis synthétiques. 10 sont chargés dans `fact_public_contract`, chacun sur une commune réelle. 1 extraction au montant négatif est refusée. 1 avis sous le seuil (montant faux dans le cache) attend en revue et n'est pas chargé.
+- Exactitude par champ : 0,9875, soit 79 champs sur 80. Les 10 libellés ne sont pas relus. Le lien par l'entreprise n'est pas fait.
+- pytest 54. `make healthcheck` affiche `ok`. Tests dbt : 75 réussis, 0 échoué. Decks FR ajustés là où ils disaient encore que les avis n'étaient pas mesurés. Decks EN non modifiés. La doc dbt n'a pas été régénérée.

@@ -1,0 +1,60 @@
+---
+description: Dérogations au template pour le projet BEP (data engineering) — priment sur les règles 00 à 05
+globs:
+alwaysApply: true
+---
+
+# Portée
+
+Ce projet est un socle de données de démonstration pour un entretien. Les
+règles ci-dessous **priment** sur les règles 00 à 05 en cas de conflit.
+Spécification complète : `brief/specification.md`. Le cadrage (identité,
+objectif, roadmap) est **déjà validé** par l'utilisateur : ne le redemande pas.
+
+# Outils pré-validés
+
+Docker Compose, PostgreSQL 16 (conteneur), Python 3.11, dbt-postgres,
+pydantic, psycopg, pytest, ruff, rapidfuzz, matplotlib (figures des
+présentations), Node et `npx @marp-team/marp-cli` (aperçu local). Pas de
+pause pour ceux-là. Tout autre outil : proposer, puis pause.
+
+# Dérogations
+
+1. **Langues** : conformes à la règle 01 (README en anglais, documentation
+   en français, code en anglais). Glossaire : commune = `municipality`,
+   code INS = `nis_code`, n° BCE = `enterprise_number`, marché public =
+   `public_contract`, établissement = `establishment`.
+2. **Présentations : FR uniquement** (technique et recruteur). Ne touche
+   pas aux decks EN et dis-le explicitement (règle 04, § FR/EN).
+3. **Aucune photo stock** (voir `brief/misc.md`). Les visuels sont des
+   schémas et graphes générés depuis les vraies données par
+   `scripts/make_figures.py` vers `pictures/presentations/`. Supprime des
+   decks toutes les lignes `![bg …](photos/…)` et les commentaires
+   « Photo : … ». Les classes `cover`, `full`, `dark`, `cta` s'utilisent
+   sans image de fond. Une slide `split` n'existe que si son visuel est un
+   fichier présent sur le disque.
+4. **Le squelette des decks est calibré pour la modélisation / le climat.**
+   Remplace : « physique en clair » par le trajet d'une donnée (source,
+   ingestion, base brute, transformation, modèle unifié) ; « agences » par
+   les acteurs (intercommunale, communes adhérentes, entreprises des parcs) ;
+   « identification / confondant » par les garde-fous de qualité (contrats
+   de données, tests dbt, quarantaine) ; « robustesse (spatial, années, n) »
+   par ce qui a cassé et comment on l'a corrigé (tiré de `JOURNAL.md` et
+   `docs/decisions.md`, jamais inventé) ; « pourquoi pas le modèle
+   tape-à-l'œil » par pourquoi des règles d'abord et l'IA seulement là où
+   elles échouent ; « que faire lundi » par ce que cela permettrait à
+   l'intercommunale (au conditionnel) ; le lien « tableau de bord » par un
+   lien vers la documentation dbt `../dbt/index.html`.
+5. **Aucun chiffre rédigé à la main** dans les decks : tout nombre vient de
+   `docs/metrics.json`, généré par `scripts/export_metrics.py`. Une valeur
+   non mesurée s'écrit « non mesuré ».
+6. **Ne modifie jamais** `docs/slides/*.html` (générés par la CI). Édite
+   uniquement `docs/presentations/*.md`.
+7. **Données indisponibles : pas de pause.** Bascule sur un échantillon
+   synthétique étiqueté `synthetic_*` et signale-le (README, cover, slide
+   « limites »). N'invente jamais une URL ni un format d'API.
+8. Une case de roadmap = une branche `feature/<nom>`, merge sans `.cursor`
+   (règle 03), journal, **pas de push**.
+9. À la fin de chaque case de présentation, liste les visuels que tu n'as
+   pas pu vérifier à l'œil. Ne dis jamais « c'est bon » sans avoir lancé
+   `python scripts/check-slides.py` et `scripts/build-slides.sh`.

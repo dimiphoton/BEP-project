@@ -59,6 +59,24 @@ models:
         tests:
           - not_null
 
+  - name: fact_public_contract
+    description: Avis rattachés à la commune d'exécution. Pas encore à l'entreprise.
+    columns:
+      - name: notice_id
+        tests:
+          - unique
+          - not_null
+      - name: amount_eur
+        tests:
+          - not_null
+      - name: nis_code
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_municipality')
+                field: nis_code
+
   - name: fact_establishment
     description: Établissements rattachés à une commune et à une entreprise.
     columns:

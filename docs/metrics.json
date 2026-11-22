@@ -3,14 +3,15 @@
     "municipalities": 38,
     "establishments": 300,
     "enterprises": 250,
-    "public_contracts": null
+    "public_contracts": 10
   },
   "rejects": {
     "statbel_tf_soc_pop_struct_2025": 0,
-    "synthetic_establishments": 0
+    "synthetic_establishments": 0,
+    "synthetic_public_contracts": 1
   },
   "dbt": {
-    "passed": 61,
+    "passed": 75,
     "failed": 0
   },
   "ai": {
@@ -19,12 +20,16 @@
     "nace_scored": 50,
     "nace_unverified": 50,
     "nace_below_threshold": 7,
-    "extraction_field_accuracy": null
+    "extraction_field_accuracy": 0.9875,
+    "extraction_fields_matched": 79,
+    "extraction_fields_scored": 80,
+    "extraction_unverified": 10,
+    "extraction_below_threshold": 1
   },
   "data_origin": {
     "municipalities": "real",
     "establishments": "synthetic",
-    "public_contracts": null
+    "public_contracts": "synthetic"
   },
-  "generated_at": "2026-11-22T22:07:35+00:00"
+  "generated_at": "2026-11-22T22:42:39+00:00"
 }

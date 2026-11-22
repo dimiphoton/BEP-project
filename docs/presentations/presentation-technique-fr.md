@@ -69,7 +69,7 @@ dbt seul produit la commune, l'entreprise, l'établissement.
 
 0 ligne refusée sur les deux chargements.
 
-61 tests dbt réussissent.
+75 tests dbt réussissent.
 
 0 test échoue.
 
@@ -77,13 +77,13 @@ dbt seul produit la commune, l'entreprise, l'établissement.
 
 <!-- _class: dark -->
 
-# Le périmètre s'arrête au projet A.
+# Dix avis sont rattachés à leur commune.
 
-On garantit le rattachement établissement, entreprise, commune.
+10 avis synthétiques ont une commune d'exécution.
 
-On n'ingère pas les avis de marché.
+Le lien avec l'entreprise n'est pas fait.
 
-Ce volume reste non mesuré.
+L'établissement, lui, reste sur sa commune.
 
 ---
 
@@ -171,7 +171,7 @@ Les établissements restent un échantillon synthétique.
 
 Les 50 libellés de famille ne sont pas relus.
 
-Les avis de marché restent non mesuré.
+Les avis ne sont pas encore liés à une entreprise.
 
 ---
 
@@ -182,7 +182,7 @@ Les avis de marché restent non mesuré.
 - Voir quelles communes concentrent les établissements
 - Relire les réponses de famille encore en revue
 - Rejouer un chargement sans doubler les sites
-- Brancher les marchés plus tard, encore non mesuré
+- Relier ensuite l'avis à l'entreprise, ce n'est pas fait
 
 ---
 

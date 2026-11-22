@@ -11,6 +11,20 @@ from pathlib import Path
 import psycopg
 
 from observatory.config import Settings, ensure_dotenv
+from observatory.contracts import (
+    EVAL_SOURCE_NAME as CONTRACT_EVAL_SOURCE,
+)
+from observatory.contracts import (
+    SAMPLE_PATH as CONTRACT_SAMPLE,
+)
+from observatory.contracts import (
+    SOURCE_NAME as CONTRACT_SOURCE,
+)
+from observatory.contracts import (
+    evaluate_contracts,
+    ingest_contracts,
+    log_contract_calls,
+)
 from observatory.db import (
     EXPECTED_ROLES,
     EXPECTED_SCHEMAS,
@@ -196,6 +210,48 @@ def cmd_ingest(settings: Settings) -> int:
             rows_rejected=0,
             status=nace_status,
         )
+        contract_run = start_run(connection, CONTRACT_SOURCE)
+        if not CONTRACT_SAMPLE.exists():
+            logger.error("missing sample %s", CONTRACT_SAMPLE.as_posix())
+            finish_run(
+                connection,
+                contract_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
+            return 1
+        try:
+            loaded, rejected, review = ingest_contracts(
+                connection,
+                CONTRACT_SAMPLE,
+                mode=settings.ai_mode,
+                threshold=settings.ai_confidence_threshold,
+            )
+        except (
+            LiveProviderNotConfigured,
+            FileNotFoundError,
+            ValueError,
+            psycopg.Error,
+        ) as exc:
+            logger.error("%s", exc)
+            finish_run(
+                connection,
+                contract_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
+            return 1
+        contract_status = "success" if loaded > 0 else "failed"
+        # La revue n'est pas un rejet : seules les extractions invalides le sont.
+        finish_run(
+            connection,
+            contract_run,
+            rows_read=loaded + rejected + review,
+            rows_rejected=rejected,
+            status=contract_status,
+        )
     logger.info(
         "loaded %s municipalities, rejected %s lines, source %s",
         result.loaded,
@@ -220,6 +276,15 @@ def cmd_ingest(settings: Settings) -> int:
     )
     if classified.codes == 0:
         logger.error("no nace code was classified")
+        return 1
+    logger.info(
+        "loaded %s public contracts, rejected %s lines, %s to review",
+        loaded,
+        rejected,
+        review,
+    )
+    if loaded == 0:
+        logger.error("no public contract was loaded")
         return 1
     return 0
 
@@ -275,6 +340,57 @@ def cmd_eval_nace(settings: Settings) -> int:
     return 0
 
 
+def cmd_eval_contracts(settings: Settings) -> int:
+    """Mesure l'exactitude de chaque champ extrait des avis.
+
+    Parameters
+    ----------
+    settings :
+        Mode d'IA, seuil, et mot de passe de ``ingest_rw`` pour le journal.
+
+    Returns
+    -------
+    int
+        0 si le score est calculé, 1 sinon.
+    """
+    settings.require("ingest_password")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        result = evaluate_contracts(
+            mode=settings.ai_mode,
+            threshold=settings.ai_confidence_threshold,
+        )
+    except (LiveProviderNotConfigured, FileNotFoundError, ValueError) as exc:
+        logger.error("%s", exc)
+        return 1
+    if result.scored == 0:
+        logger.error("gold file has no field")
+        return 1
+    print(
+        f"contract field accuracy {result.accuracy:.4f} "
+        f"({result.matched}/{result.scored}); "
+        f"unverified labels {result.unverified}; "
+        f"below threshold {result.below_threshold}",
+        flush=True,
+    )
+    try:
+        with connect(
+            settings,
+            user=settings.ingest_user,
+            password=settings.ingest_password,
+        ) as connection:
+            logged = log_contract_calls(
+                connection,
+                result.calls,
+                source_name=CONTRACT_EVAL_SOURCE,
+            )
+    except psycopg.Error as exc:
+        logger.error("ai_log not written: %s", exc)
+        return 1
+    logger.info("appended %s ai calls to ops.ai_log", logged)
+    return 0
+
+
 def cmd_build() -> int:
     """Lance ``dbt build`` avec les variables déjà chargées depuis `.env`.
 
@@ -313,6 +429,7 @@ def main() -> None:
     sub.add_parser("ingest", help="Load sources and classify NACE families")
     sub.add_parser("build", help="Run dbt build")
     sub.add_parser("eval-nace", help="Score NACE families against the gold file")
+    sub.add_parser("eval-contracts", help="Score contract fields against the gold file")
     args = parser.parse_args()
 
     if args.command == "ensure-env":
@@ -328,6 +445,8 @@ def main() -> None:
         raise SystemExit(cmd_ingest(settings))
     if args.command == "eval-nace":
         raise SystemExit(cmd_eval_nace(settings))
+    if args.command == "eval-contracts":
+        raise SystemExit(cmd_eval_contracts(settings))
 
 
 if __name__ == "__main__":
