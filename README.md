@@ -23,9 +23,19 @@ the province's business parks?
 
 ## Data
 
-No source extract is loaded yet. Planned coverage: Province of Namur,
-sample years 2024–2026. If a public file cannot be downloaded, a later
-step will switch to a synthetic sample labelled `synthetic_*`.
+Municipality population for the Province of Namur is a real Statbel extract,
+reference year 2025: [Population par lieu de résidence, nationalité, état civil, âge et sexe](https://statbel.fgov.be/fr/open-data/population-par-lieu-de-residence-nationalite-etat-civil-age-et-sexe-16)
+(CC BY 4.0). The pipeline keeps province code `90000` and sums population
+over age, sex, nationality and marital status, one row per `nis_code`.
+
+The versioned extract is `data/sample/statbel_population_namur_2025.csv`.
+When `data/raw/TF_SOC_POP_STRUCT_2025.zip` is present, `make ingest` uses
+that file instead. The full zip is not committed.
+
+No other source is loaded yet. Planned coverage for the rest of the
+observatory: Province of Namur, sample years 2024–2026. If a later public
+file cannot be downloaded, that step will switch to a synthetic sample
+labelled `synthetic_*`.
 
 ## Result
 
@@ -54,7 +64,7 @@ reapply it: `docker compose down -v`, then `make up`.
 | Target | What it does |
 |---|---|
 | `make up` | Start Postgres and list schemas and roles |
-| `make ingest` | Check that `ingest_rw` can write `raw` and `ops` |
+| `make ingest` | Load Statbel municipality population into `raw` |
 | `make build` | `dbt build` (no model at this step) |
 | `make test` | `pytest` |
 

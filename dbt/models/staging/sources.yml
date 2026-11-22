@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: municipality_population
+        description: Population communale chargée par l'ingestion Statbel.
+        columns:
+          - name: nis_code
+            description: Code INS de la commune, clé naturelle.
+            tests:
+              - unique
+              - not_null
