@@ -11,6 +11,18 @@ ENV_PATH = Path(".env")
 ENV_EXAMPLE_PATH = Path(".env.example")
 
 
+def _confidence_threshold() -> float:
+    """Lit le seuil de revue. Une valeur illisible arrête le programme."""
+    raw = os.environ.get("AI_CONFIDENCE_THRESHOLD", "0.8")
+    try:
+        threshold = float(raw)
+    except ValueError as exc:
+        raise SystemExit(f"AI_CONFIDENCE_THRESHOLD is not a number ({raw}).") from exc
+    if not 0 <= threshold <= 1:
+        raise SystemExit("AI_CONFIDENCE_THRESHOLD must be between 0 and 1.")
+    return threshold
+
+
 def ensure_dotenv(
     env_path: Path = ENV_PATH,
     example_path: Path = ENV_EXAMPLE_PATH,
@@ -57,6 +69,8 @@ class Settings(BaseModel):
     dbt_password: str = ""
     reader_user: str = "reader_ro"
     reader_password: str = ""
+    ai_mode: str = "mock"
+    ai_confidence_threshold: float = 0.8
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -80,6 +94,8 @@ class Settings(BaseModel):
             dbt_password=os.environ.get("DBT_PASSWORD", ""),
             reader_user=os.environ.get("READER_USER", "reader_ro"),
             reader_password=os.environ.get("READER_PASSWORD", ""),
+            ai_mode=os.environ.get("AI_MODE", "mock").strip().lower() or "mock",
+            ai_confidence_threshold=_confidence_threshold(),
         )
 
     def require(self, *fields: str) -> None:

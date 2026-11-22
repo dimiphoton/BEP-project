@@ -6,3 +6,4 @@
 - Socle Postgres 16 : schémas `raw`, `staging`, `marts`, `ops` et rôles `ingest_rw`, `dbt_rw`, `reader_ro`.
 - Dimension `dim_municipality` : population Statbel 2025 des communes de la province de Namur, quarantaine `ops.rejects`.
 - Établissements : échantillon `synthetic_establishments` (la BCE Open Data exige un compte), `dim_enterprise`, `fact_establishment`, snapshot dbt.
+- Famille d'activité : règle sur les sections NACE univoques, cache mock sinon, file `ops.review_queue` sous le seuil, journal `ops.ai_log`, évaluation `make eval-nace` sur des libellés non relus.

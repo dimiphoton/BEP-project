@@ -11,7 +11,7 @@ else
   PY ?= $(VENV_PY)
 endif
 
-.PHONY: up ingest build test
+.PHONY: up ingest build test eval-nace
 
 up:
 	$(PY) -m observatory.cli ensure-env
@@ -26,3 +26,6 @@ build:
 
 test:
 	$(PY) -m pytest
+
+eval-nace:
+	$(PY) -m observatory.cli eval-nace

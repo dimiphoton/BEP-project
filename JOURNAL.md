@@ -27,3 +27,11 @@
 - dbt : `dim_enterprise`, `fact_establishment`, snapshot `enterprise_snapshot` (stratégie check). Le test de relation vers `dim_municipality` passe : aucun établissement sans commune valide.
 - `make ingest build test` vert (dbt PASS=53, pytest 24).
 - Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.
+
+## 2026-11-22 — Famille d'activité NACE
+
+- Règle sur les sections NACE univoques (industrie, construction, commerce, logistique, services). Les autres sections lisent le cache mock. `AI_MODE=live` s'arrête : aucun fournisseur, aucun format d'API inventé.
+- Les 8 codes de l'échantillon sont tous décidés par la règle : 0 appel, 0 ligne en revue. Sous le seuil 0,8, la réponse va dans `ops.review_queue`. Chaque appel est ajouté à `ops.ai_log`.
+- `make eval-nace` affiche `nace agreement 0.9800 (49/50); unverified labels 50; below threshold 7`. Les 50 libellés de `gold_nace.csv` ont `label_verified=false`. Le seul désaccord est le code 0729 (cache : industrie, fichier : autre, confiance 0,61, donc en revue).
+- `make ingest build test` vert (dbt PASS=69, pytest 32).
+- Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.

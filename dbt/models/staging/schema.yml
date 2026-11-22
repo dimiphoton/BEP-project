@@ -62,3 +62,32 @@ models:
       - name: establishment_name
         tests:
           - not_null
+
+  - name: stg_nace_activity
+    description: Famille d'activité, une ligne par code NACE.
+    columns:
+      - name: nace_code
+        tests:
+          - unique
+          - not_null
+      - name: activity_family
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - industrie
+                  - logistique
+                  - commerce
+                  - services
+                  - construction
+                  - autre
+      - name: method
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["rule", "ai"]
+      - name: confidence
+        tests:
+          - not_null

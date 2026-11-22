@@ -38,7 +38,7 @@ official download asks for an account
 ([BCE Open Data](https://kbopub.economie.fgov.be/kbo-open-data/login?lang=fr)).
 The 300 sites use real Namur municipality codes from the Statbel extract.
 Names, enterprise numbers and NACE codes in that file are generated, not
-observed.
+observed. The activity family is assigned from the NACE code afterwards.
 
 ## Result
 
@@ -46,6 +46,15 @@ observed.
 `dim_enterprise` and `fact_establishment` hold the synthetic establishments,
 each tied to one of those municipalities. `enterprise_snapshot` keeps the
 enterprise name and NACE code over time.
+
+Each NACE code is mapped to one activity family: industrie, logistique,
+commerce, services, construction, autre. A NACE section with a single family
+uses a rule. The other sections use the mock cache in `ai/cache/`
+(`AI_MODE=mock` by default). A cached answer under the confidence threshold
+goes to `ops.review_queue`. Every model call is appended to `ops.ai_log`.
+`make eval-nace` scores `data/eval/gold_nace.csv` (50 rows,
+`label_verified=false`: draft labels). Live mode stops with an error until
+a provider is chosen.
 
 ## Reproduce
 
@@ -68,16 +77,19 @@ reapply it: `docker compose down -v`, then `make up`.
 | Target | What it does |
 |---|---|
 | `make up` | Start Postgres and list schemas and roles |
-| `make ingest` | Load municipalities, then the synthetic establishments |
+| `make ingest` | Load municipalities, establishments, then NACE families |
 | `make build` | `dbt build` (models, snapshot, tests) |
 | `make test` | `pytest` |
+| `make eval-nace` | Score NACE families and append model calls to `ops.ai_log` |
 
 ## Repo structure
 
 - `db/init/` — schemas and roles, applied on the first database start
 - `data/sample/` — Statbel municipality extract and `synthetic_establishments`
+- `data/eval/` — draft NACE labels (`label_verified=false`)
+- `ai/` — prompt and mock cache
 - `dbt/` — staging, marts, snapshot of `dim_enterprise`
-- `src/observatory/` — CLI (`check`, `ingest`, `build`)
+- `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`)
 - `brief/` — scope and specification (French)
 - `ROADMAP.md`, `JOURNAL.md` — plan and development log (French)
 
