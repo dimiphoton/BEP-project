@@ -1,0 +1,14 @@
+name: observatory
+version: "1.0.0"
+config-version: 2
+profile: observatory
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets:
+  - target
+  - dbt_packages
+
+# Pas de modèle à cette étape. Les dossiers models/ préparent staging et marts.
