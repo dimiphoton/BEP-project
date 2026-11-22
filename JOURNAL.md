@@ -74,3 +74,9 @@
 
 - Sur 10 avis chargés : 8 liés (numéro connu ou nom identique), 1 nom proche en revue, 1 nom éloigné sans lien. `mart_contracts_by_municipality` mesure 0 site dans la commune d'exécution.
 - pytest 59. Healthcheck `ok`. Tests dbt : 88 réussis, 0 échoué. Decks FR mis à jour, graphe des trois issues inclus. Decks EN non modifiés. La doc dbt n'a pas été régénérée. Le graphe a été vu. Les slides rendues, non.
+
+## 2026-11-22 — Documentation de clôture
+
+- README en anglais : mesures recopiées depuis `docs/metrics.json`, données réelles et synthétiques séparées, ce que la démo ne fait pas (Airflow, CDC, alerting, IA live, BCE, portails de marchés).
+- La doc dbt a été régénérée : elle contient le mart des avis. Aucun mot de passe de démo dans les JSON copiés.
+- Decks FR non réécrits : ils disaient déjà l'échantillon synthétique et l'absence de site dans la commune de l'avis. Decks EN non modifiés. Le HTML de `docs/slides/` reste le squelette, laissé à la CI.
