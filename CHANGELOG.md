@@ -11,3 +11,4 @@
 - Outillage des présentations : `docs/metrics.json`, graphiques, documentation dbt, contrôle `scripts/check-slides.py`. Les decks eux-mêmes restent le squelette.
 - Deck technique FR, projet A : question sur le rattachement à la commune, chiffres lus dans `docs/metrics.json`.
 - Deck recruteur FR : même périmètre, en langage clair. Les marchés restent non mesurés.
+- Avis de marchés : échantillon `synthetic_public_contracts`, extraction par cache mock, `fact_public_contract` lié à la commune. L'exactitude par champ est mesurée sur 10 avis non relus. Le lien par l'entreprise n'est pas fait.

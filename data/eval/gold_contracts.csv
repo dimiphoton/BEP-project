@@ -1,0 +1,11 @@
+notice_id,object_text,awarding_authority,lot_count,cpv_code,amount_eur,nis_code,winner_name,enterprise_number,label_verified
+synthetic-notice-01,réfection de voiries,BEP,2,45233120,185000,92094,Synthetic firm 001,0000000196,false
+synthetic-notice-02,nettoyage des halls,Commune de Gembloux,1,90910000,42000,92142,Synthetic firm 002,0000000295,false
+synthetic-notice-03,construction d'un atelier,BEP,3,45210000,960000,93088,Synthetic firm 003,0000000394,false
+synthetic-notice-04,entretien des espaces verts,Commune de Ciney,1,77310000,12800,91030,Synthetic firm 004,,false
+synthetic-notice-05,fourniture de véhicules,BEP,2,34100000,250000,92140,Synthetic firm 005,,false
+synthetic-notice-06,étude de voirie,Commune de Sombreffe,1,71300000,76000,92114,Synthetic firm 006,0000000691,false
+synthetic-notice-07,réfection d'un accès,BEP,2,45233120,280000,92141,Synthetic firm 007,0000000790,false
+synthetic-notice-08,gros oeuvre d'un hall,Commune d'Anhée,1,45000000,54000,91005,Synthetic firm 008,,false
+synthetic-notice-09,nettoyage de bureaux,BEP,1,90910000,89000,91013,Synthetic firm 009,0000000988,false
+synthetic-notice-10,plantations d'alignement,Commune de Bièvre,1,77310000,15000,91015,Synthetic firm 010,,false

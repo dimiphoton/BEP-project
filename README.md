@@ -40,11 +40,21 @@ The 300 sites use real Namur municipality codes from the Statbel extract.
 Names, enterprise numbers and NACE codes in that file are generated, not
 observed. The activity family is assigned from the NACE code afterwards.
 
+Public-contract notices are a synthetic sample,
+`data/sample/synthetic_public_contracts.csv`, labelled
+`synthetic_public_contracts`. No TED or Walloon portal file is parsed:
+those formats were not read. A mock cache extracts each notice. One notice
+with a negative amount is quarantined. One notice under the confidence
+threshold waits in `ops.review_queue` and is not loaded. The loaded notices
+are tied to the execution municipality only, not yet to an enterprise.
+
 ## Result
 
 `dim_municipality` holds the Statbel 2025 population of the Province of Namur.
 `dim_enterprise` and `fact_establishment` hold the synthetic establishments,
-each tied to one of those municipalities. `enterprise_snapshot` keeps the
+each tied to one of those municipalities. `fact_public_contract` holds the
+synthetic notices that passed extraction, each tied to its execution
+municipality. `enterprise_snapshot` keeps the
 enterprise name and NACE code over time.
 
 Each NACE code is mapped to one activity family: industrie, logistique,
@@ -53,8 +63,10 @@ uses a rule. The other sections use the mock cache in `ai/cache/`
 (`AI_MODE=mock` by default). A cached answer under the confidence threshold
 goes to `ops.review_queue`. Every model call is appended to `ops.ai_log`.
 `make eval-nace` scores `data/eval/gold_nace.csv` (50 rows,
-`label_verified=false`: draft labels). Live mode stops with an error until
-a provider is chosen.
+`label_verified=false`: draft labels). `make eval-contracts` scores each
+extracted field of `data/eval/gold_contracts.csv` (10 notices, also
+`label_verified=false`). Live mode stops with an error until a provider
+is chosen.
 
 Each ingest step is appended to `ops.run_log` (start, end, rows read,
 rows rejected, status). `make healthcheck` fails when a monitored source
@@ -87,6 +99,7 @@ reapply it: `docker compose down -v`, then `make up`.
 | `make build` | `dbt build` (models, snapshot, tests) |
 | `make test` | `pytest` |
 | `make eval-nace` | Score NACE families and append model calls to `ops.ai_log` |
+| `make eval-contracts` | Score extracted contract fields and append those calls |
 | `make healthcheck` | Fail if a source is stale or its kept volume drops by more than half |
 | `make metrics` | Write `docs/metrics.json` from the database, dbt and the NACE eval |
 | `make figures` | Write the presentation charts under `pictures/presentations/` |
@@ -100,7 +113,7 @@ reapply it: `docker compose down -v`, then `make up`.
 - `data/eval/` — draft NACE labels (`label_verified=false`)
 - `ai/` — prompt and mock cache
 - `dbt/` — staging, marts, snapshot of `dim_enterprise`
-- `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`)
+- `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`, `eval-contracts`)
 - `scripts/healthcheck.py` — freshness and volume of the monitored sources
 - `scripts/export_metrics.py`, `make_figures.py`, `check-slides.py` — measured numbers, charts, deck checks
 - `docs/dbt/` — static dbt docs (`make dbt-docs`)

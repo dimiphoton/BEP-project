@@ -1,6 +1,20 @@
 version: 2
 
 models:
+  - name: stg_public_contract
+    description: Avis extraits, tels que déposés dans raw.
+    columns:
+      - name: notice_id
+        tests:
+          - unique
+          - not_null
+      - name: amount_eur
+        tests:
+          - not_null
+      - name: nis_code
+        tests:
+          - not_null
+
   - name: stg_municipality
     description: Population communale, telle que déposée dans raw.
     columns:

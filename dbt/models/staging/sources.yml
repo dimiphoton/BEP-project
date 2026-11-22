@@ -32,6 +32,19 @@ sources:
           - name: enterprise_number
             tests:
               - not_null
+      - name: public_contract
+        description: Avis synthétiques extraits par le cache mock.
+        columns:
+          - name: notice_id
+            tests:
+              - unique
+              - not_null
+          - name: amount_eur
+            tests:
+              - not_null
+          - name: nis_code
+            tests:
+              - not_null
       - name: nace_activity
         description: Famille d'activité d'un code NACE, règle ou cache mock.
         columns:

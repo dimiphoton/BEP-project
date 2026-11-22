@@ -1,0 +1,138 @@
+{
+  "model": "mock-contract-cache",
+  "prompt_version": "contract-extract-1",
+  "answers": {
+    "synthetic-notice-01": {
+      "object_text": "réfection de voiries",
+      "awarding_authority": "BEP",
+      "lot_count": 2,
+      "cpv_code": "45233120",
+      "amount_eur": "185000",
+      "nis_code": "92094",
+      "winner_name": "Synthetic firm 001",
+      "enterprise_number": "0000000196",
+      "confidence": 0.93
+    },
+    "synthetic-notice-02": {
+      "object_text": "nettoyage des halls",
+      "awarding_authority": "Commune de Gembloux",
+      "lot_count": 1,
+      "cpv_code": "90910000",
+      "amount_eur": "42000",
+      "nis_code": "92142",
+      "winner_name": "Synthetic firm 002",
+      "enterprise_number": "0000000295",
+      "confidence": 0.91
+    },
+    "synthetic-notice-03": {
+      "object_text": "construction d'un atelier",
+      "awarding_authority": "BEP",
+      "lot_count": 3,
+      "cpv_code": "45210000",
+      "amount_eur": "960000",
+      "nis_code": "93088",
+      "winner_name": "Synthetic firm 003",
+      "enterprise_number": "0000000394",
+      "confidence": 0.95
+    },
+    "synthetic-notice-04": {
+      "object_text": "entretien des espaces verts",
+      "awarding_authority": "Commune de Ciney",
+      "lot_count": 1,
+      "cpv_code": "77310000",
+      "amount_eur": "12800",
+      "nis_code": "91030",
+      "winner_name": "Synthetic firm 004",
+      "enterprise_number": "",
+      "confidence": 0.88
+    },
+    "synthetic-notice-05": {
+      "object_text": "fourniture de véhicules",
+      "awarding_authority": "BEP",
+      "lot_count": 2,
+      "cpv_code": "34100000",
+      "amount_eur": "250000",
+      "nis_code": "92140",
+      "winner_name": "Synthetic firm 005",
+      "enterprise_number": "",
+      "confidence": 0.9
+    },
+    "synthetic-notice-06": {
+      "object_text": "étude de voirie",
+      "awarding_authority": "Commune de Sombreffe",
+      "lot_count": 1,
+      "cpv_code": "71300000",
+      "amount_eur": "76000",
+      "nis_code": "92114",
+      "winner_name": "Synthetic firm 006",
+      "enterprise_number": "0000000691",
+      "confidence": 0.92
+    },
+    "synthetic-notice-07": {
+      "object_text": "réfection d'un accès",
+      "awarding_authority": "BEP",
+      "lot_count": 2,
+      "cpv_code": "45233120",
+      "amount_eur": "310000",
+      "nis_code": "92141",
+      "winner_name": "Synthetic firm 007",
+      "enterprise_number": "0000000790",
+      "confidence": 0.72
+    },
+    "synthetic-notice-08": {
+      "object_text": "gros oeuvre d'un hall",
+      "awarding_authority": "Commune d'Anhée",
+      "lot_count": 1,
+      "cpv_code": "45000000",
+      "amount_eur": "54000",
+      "nis_code": "91005",
+      "winner_name": "Synthetic firm 008",
+      "enterprise_number": "",
+      "confidence": 0.86
+    },
+    "synthetic-notice-09": {
+      "object_text": "nettoyage de bureaux",
+      "awarding_authority": "BEP",
+      "lot_count": 1,
+      "cpv_code": "90910000",
+      "amount_eur": "89000",
+      "nis_code": "91013",
+      "winner_name": "Synthetic firm 009",
+      "enterprise_number": "0000000988",
+      "confidence": 0.94
+    },
+    "synthetic-notice-10": {
+      "object_text": "plantations d'alignement",
+      "awarding_authority": "Commune de Bièvre",
+      "lot_count": 1,
+      "cpv_code": "77310000",
+      "amount_eur": "15000",
+      "nis_code": "91015",
+      "winner_name": "Synthetic firm 010",
+      "enterprise_number": "",
+      "confidence": 0.87
+    },
+    "synthetic-notice-11": {
+      "object_text": "entretien d'un bâtiment",
+      "awarding_authority": "BEP",
+      "lot_count": 2,
+      "cpv_code": "45210000",
+      "amount_eur": "64000",
+      "nis_code": "92094",
+      "winner_name": "Synthetic firm 011",
+      "enterprise_number": "0000001186",
+      "confidence": 0.9
+    },
+    "synthetic-notice-12": {
+      "object_text": "avis illisible",
+      "awarding_authority": "BEP",
+      "lot_count": 1,
+      "cpv_code": "45000000",
+      "amount_eur": "-500",
+      "nis_code": "92094",
+      "winner_name": "Synthetic firm 012",
+      "enterprise_number": "",
+      "confidence": 0.4
+    }
+  }
+}

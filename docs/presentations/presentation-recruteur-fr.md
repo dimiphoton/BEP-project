@@ -66,13 +66,13 @@ On ne les lit pas comme une observation du terrain.
 
 <!-- _class: dark -->
 
-# On situe les sites. On ne tranche pas les marchés.
+# On situe les sites, et aussi les avis.
 
 Chaque site publié a une commune.
 
-La question des marchés publics reste ouverte.
+10 avis synthétiques aussi.
 
-Ce volume est non mesuré.
+Le lien entre l'avis et l'entreprise n'est pas fait.
 
 ---
 
@@ -104,7 +104,7 @@ Les noms d'entreprises sont fabriqués.
 
 L'activité vient d'une règle, pas d'une visite sur place.
 
-Les avis publics restent non mesuré.
+Les avis sont fabriqués, et liés seulement par la commune.
 
 ---
 
@@ -128,7 +128,7 @@ Les sites restent un échantillon synthétique.
 
 Les activités proposées n'ont pas été relues.
 
-Le lien avec les marchés reste non mesuré.
+Les avis ne sont pas encore liés à une entreprise.
 
 ---
 
@@ -139,7 +139,7 @@ Le lien avec les marchés reste non mesuré.
 - Dire à une commune quels sites de l'échantillon elle porte
 - Relire les 7 cas encore douteux
 - Rejouer le chargement sans compter deux fois le même site
-- Laisser les marchés pour plus tard : non mesuré
+- Relier ensuite l'avis à l'entreprise, ce n'est pas fait
 
 ---
 

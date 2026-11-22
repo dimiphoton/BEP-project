@@ -40,4 +40,5 @@ jobs:
           make build
           make test
           make eval-nace
+          make eval-contracts
           make healthcheck

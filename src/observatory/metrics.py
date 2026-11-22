@@ -1,7 +1,7 @@
 """Mesures écrites dans ``docs/metrics.json``. Rien n'y est saisi à la main.
 
-Un comptage impossible (table absente, ``dbt`` pas encore lancé, extraction
-des avis pas construite) reste ``null``. Ce n'est pas un zéro.
+Un comptage impossible (table absente, ``dbt`` pas encore lancé) reste
+``null``. Ce n'est pas un zéro.
 """
 
 from __future__ import annotations
@@ -10,6 +10,8 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from observatory.contracts import SOURCE_NAME as CONTRACT_SOURCE
+from observatory.contracts import evaluate_contracts
 from observatory.db import PgConnection
 from observatory.establishments import SOURCE_NAME as ESTABLISHMENT_SOURCE
 from observatory.municipalities import SOURCE_NAME as MUNICIPALITY_SOURCE
@@ -84,6 +86,7 @@ def collect_metrics(connection: PgConnection) -> dict:
         Document ``metrics.json``, clés dans un ordre stable.
     """
     evaluation = evaluate_gold()
+    contracts = evaluate_contracts()
     dbt_passed, dbt_failed = load_dbt_tests()
     return {
         "counts": {
@@ -100,12 +103,16 @@ def collect_metrics(connection: PgConnection) -> dict:
             "nace_scored": evaluation.scored,
             "nace_unverified": evaluation.unverified,
             "nace_below_threshold": evaluation.below_threshold,
-            "extraction_field_accuracy": None,
+            "extraction_field_accuracy": round(contracts.accuracy, 4),
+            "extraction_fields_matched": contracts.matched,
+            "extraction_fields_scored": contracts.scored,
+            "extraction_unverified": contracts.unverified,
+            "extraction_below_threshold": contracts.below_threshold,
         },
         "data_origin": {
             "municipalities": "real",
             "establishments": "synthetic",
-            "public_contracts": None,
+            "public_contracts": "synthetic",
         },
         "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
     }
@@ -140,7 +147,11 @@ def _count_relation(connection: PgConnection, qualified: str) -> int | None:
 
 def _reject_counts(connection: PgConnection) -> dict[str, int]:
     """Rejets par source. Les deux sources chargées apparaissent même à zéro."""
-    counts = {MUNICIPALITY_SOURCE: 0, ESTABLISHMENT_SOURCE: 0}
+    counts = {
+        MUNICIPALITY_SOURCE: 0,
+        ESTABLISHMENT_SOURCE: 0,
+        CONTRACT_SOURCE: 0,
+    }
     found = connection.execute("SELECT to_regclass('ops.rejects')").fetchone()
     if found is None or found[0] is None:
         return counts
