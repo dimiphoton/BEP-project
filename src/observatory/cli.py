@@ -20,8 +20,20 @@ from observatory.db import (
     list_schemas,
     missing_names,
 )
-from observatory.establishments import ESTABLISHMENT_SAMPLE, ingest_establishments
-from observatory.municipalities import ingest_population, resolve_population_source
+from observatory.establishments import (
+    ESTABLISHMENT_SAMPLE,
+    ingest_establishments,
+)
+from observatory.establishments import (
+    SOURCE_NAME as ESTABLISHMENT_SOURCE,
+)
+from observatory.municipalities import (
+    SOURCE_NAME as MUNICIPALITY_SOURCE,
+)
+from observatory.municipalities import (
+    ingest_population,
+    resolve_population_source,
+)
 from observatory.nace import (
     EVAL_SOURCE_NAME,
     LiveProviderNotConfigured,
@@ -29,6 +41,10 @@ from observatory.nace import (
     evaluate_gold,
     log_ai_calls,
 )
+from observatory.nace import (
+    SOURCE_NAME as NACE_SOURCE,
+)
+from observatory.runs import finish_run, start_run
 
 logger = logging.getLogger(__name__)
 
@@ -98,14 +114,63 @@ def cmd_ingest(settings: Settings) -> int:
         if not ingest_can_write(connection):
             logger.error("ingest_rw cannot create objects in raw and ops")
             return 1
-        result = ingest_population(connection, source)
+        population_run = start_run(connection, MUNICIPALITY_SOURCE)
+        try:
+            result = ingest_population(connection, source)
+        except (psycopg.Error, OSError, ValueError) as exc:
+            # On ferme le passage avant de sortir, sinon il resterait « running ».
+            logger.error("%s", exc)
+            finish_run(
+                connection,
+                population_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
+            return 1
+        population_status = "success" if result.loaded > 0 else "failed"
+        finish_run(
+            connection,
+            population_run,
+            rows_read=result.loaded + result.rejected,
+            rows_rejected=result.rejected,
+            status=population_status,
+        )
         if result.loaded == 0:
             logger.error("no municipality was loaded")
             return 1
+        establishment_run = start_run(connection, ESTABLISHMENT_SOURCE)
         if not ESTABLISHMENT_SAMPLE.exists():
             logger.error("missing sample %s", ESTABLISHMENT_SAMPLE.as_posix())
+            finish_run(
+                connection,
+                establishment_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
             return 1
-        establishments = ingest_establishments(connection, ESTABLISHMENT_SAMPLE)
+        try:
+            establishments = ingest_establishments(connection, ESTABLISHMENT_SAMPLE)
+        except (psycopg.Error, OSError, ValueError) as exc:
+            logger.error("%s", exc)
+            finish_run(
+                connection,
+                establishment_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
+            return 1
+        establishment_status = "success" if establishments.loaded > 0 else "failed"
+        finish_run(
+            connection,
+            establishment_run,
+            rows_read=establishments.loaded + establishments.rejected,
+            rows_rejected=establishments.rejected,
+            status=establishment_status,
+        )
+        nace_run = start_run(connection, NACE_SOURCE)
         try:
             classified = classify_loaded_enterprises(
                 connection,
@@ -114,7 +179,23 @@ def cmd_ingest(settings: Settings) -> int:
             )
         except (LiveProviderNotConfigured, FileNotFoundError, ValueError) as exc:
             logger.error("%s", exc)
+            finish_run(
+                connection,
+                nace_run,
+                rows_read=None,
+                rows_rejected=None,
+                status="failed",
+            )
             return 1
+        nace_status = "success" if classified.codes > 0 else "failed"
+        # La revue n'est pas un rejet : le volume suivi est le nombre de codes.
+        finish_run(
+            connection,
+            nace_run,
+            rows_read=classified.codes,
+            rows_rejected=0,
+            status=nace_status,
+        )
     logger.info(
         "loaded %s municipalities, rejected %s lines, source %s",
         result.loaded,

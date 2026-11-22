@@ -56,6 +56,12 @@ goes to `ops.review_queue`. Every model call is appended to `ops.ai_log`.
 `label_verified=false`: draft labels). Live mode stops with an error until
 a provider is chosen.
 
+Each ingest step is appended to `ops.run_log` (start, end, rows read,
+rows rejected, status). `make healthcheck` fails when a monitored source
+has no recent success, or when the rows it kept fall by more than half
+compared with its previous success. The default freshness window is 7 days
+(`HEALTHCHECK_MAX_AGE_DAYS`).
+
 ## Reproduce
 
 ```bash
@@ -81,6 +87,7 @@ reapply it: `docker compose down -v`, then `make up`.
 | `make build` | `dbt build` (models, snapshot, tests) |
 | `make test` | `pytest` |
 | `make eval-nace` | Score NACE families and append model calls to `ops.ai_log` |
+| `make healthcheck` | Fail if a source is stale or its kept volume drops by more than half |
 
 ## Repo structure
 
@@ -90,6 +97,8 @@ reapply it: `docker compose down -v`, then `make up`.
 - `ai/` — prompt and mock cache
 - `dbt/` — staging, marts, snapshot of `dim_enterprise`
 - `src/observatory/` — CLI (`check`, `ingest`, `build`, `eval-nace`)
+- `scripts/healthcheck.py` — freshness and volume of the monitored sources
+- `.github/workflows/ci.yml` — ruff, ephemeral Postgres, dbt, pytest, mock AI
 - `brief/` — scope and specification (French)
 - `ROADMAP.md`, `JOURNAL.md` — plan and development log (French)
 

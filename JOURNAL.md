@@ -35,3 +35,10 @@
 - `make eval-nace` affiche `nace agreement 0.9800 (49/50); unverified labels 50; below threshold 7`. Les 50 libellés de `gold_nace.csv` ont `label_verified=false`. Le seul désaccord est le code 0729 (cache : industrie, fichier : autre, confiance 0,61, donc en revue).
 - `make ingest build test` vert (dbt PASS=69, pytest 32).
 - Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.
+
+## 2026-11-22 — Journal des passages et healthcheck
+
+- Chaque étape de `make ingest` (communes, établissements, codes NACE) ouvre une ligne dans `ops.run_log` : début, fin, lignes lues, lignes refusées, statut. Pour les codes NACE, le volume suivi est le nombre de codes ; la file de revue n'est pas un rejet.
+- `make healthcheck` affiche `ok`. Il échoue si le dernier passage n'est pas un succès, s'il a plus de 7 jours, ou si le volume gardé chute de plus de la moitié du succès précédent. Garder exactement la moitié passe encore.
+- pytest 37. La CI (`.github/workflows/ci.yml`) enchaîne ruff, `make up`, ingest, dbt, pytest, `eval-nace` en `AI_MODE=mock`, puis le healthcheck. Elle n'a pas été observée sur GitHub : rien n'est poussé.
+- Présentations non mises à jour (cases 7 et 8, pas encore de `docs/metrics.json`). Decks EN inchangés.
