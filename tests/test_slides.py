@@ -198,7 +198,7 @@ def test_dbt_test_counts_ignore_models() -> None:
 
 
 def test_didactic_figures_write_pngs(tmp_path: Path) -> None:
-    """Schémas et population lisible, sans base. Les effectifs viennent du JSON fourni."""
+    """Schémas, population lisible et carte, sans base. Les effectifs viennent du JSON fourni."""
     sample = tmp_path / "population.csv"
     sample.write_text(
         "nis_code,municipality_name,province_nis_code,population,reference_year\n"
@@ -220,7 +220,7 @@ def test_didactic_figures_write_pngs(tmp_path: Path) -> None:
         population_csv=sample,
         metrics=metrics,
     )
-    assert len(written) == 11
+    assert len(written) == 12
     assert all(path.is_file() and path.stat().st_size > 1000 for path in written)
 
 

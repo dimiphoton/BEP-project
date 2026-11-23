@@ -114,7 +114,8 @@ section.split h1 {
 /* Un graphe, un titre-phrase au-dessus */
 section.chart {
   justify-content: center;
-  padding: 40px 48px 56px;
+  align-items: center;
+  padding: 36px 48px 48px;
 }
 
 section.chart h1 {
@@ -136,7 +137,8 @@ section.chart p {
 
 section.chart img {
   background: transparent;
-  max-height: 480px;
+  max-height: 530px;
+  max-width: 100%;
   width: auto;
   object-fit: contain;
 }

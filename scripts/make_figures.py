@@ -1,4 +1,4 @@
-"""Écrit les PNG de ``pictures/presentations`` : schémas, puis barres des marts."""
+"""Écrit les PNG de ``pictures/presentations`` : carte, schémas, puis barres des marts."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ PUBLISHED_DIR = Path("docs/slides-assets")
 
 
 def main() -> int:
-    """Dessine schémas et barres. La base absente n'empêche pas les schémas."""
+    """Dessine la carte et les schémas. La base absente n'empêche pas ce dessin."""
     written = write_didactic_figures()
     settings = Settings.from_env()
     try:

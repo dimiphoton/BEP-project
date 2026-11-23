@@ -1,8 +1,9 @@
-"""Graphiques et schémas des présentations, fond crème du thème.
+"""Graphiques, schémas et carte des présentations, fond crème du thème.
 
 Les barres viennent des mesures (fichier Statbel, marts, ``metrics.json``).
-Les schémas décrivent le trajet et le modèle : ils ne sont pas une carte.
-Les sources n'ont ni contour communal ni coordonnées.
+La carte reprend les contours communaux publiés et les comptes de
+l'échantillon : teinte pour les sites, contour pour un avis chargé,
+trait vers la commune du site de l'entreprise liée.
 """
 
 from __future__ import annotations
@@ -14,13 +15,20 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.patches import FancyBboxPatch, PathPatch
+from matplotlib.path import Path as MplPath
 
+from observatory.contracts import load_cache, load_notices, prepare_contracts
 from observatory.db import PgConnection
+from observatory.entities import ContractWinner, EnterpriseName, resolve_winners
+from observatory.establishments import ESTABLISHMENT_SAMPLE
 
 FIGURES_DIR = Path("pictures/presentations")
 POPULATION_CSV = Path("data/sample/statbel_population_namur_2025.csv")
+BOUNDARIES_GEOJSON = Path("data/sample/namur_municipalities.geojson")
 METRICS_PATH = Path("docs/metrics.json")
 # Huit noms tiennent sur une slide. Les 38 barres rendaient les communes illisibles.
 POPULATION_BARS = 8
@@ -214,7 +222,7 @@ def write_didactic_figures(
     population_csv: Path = POPULATION_CSV,
     metrics: dict | None = None,
 ) -> list[Path]:
-    """Écrit les schémas et la population lisible, sans base.
+    """Écrit les schémas, la population lisible et la carte, sans base.
 
     Parameters
     ----------
@@ -248,6 +256,7 @@ def write_didactic_figures(
     )
     return [
         population_path,
+        _problem_map(directory / "namur_contracts_sites.png"),
         _schema_two_keys(directory / "schema_two_keys.png"),
         _schema_pipeline(directory / "schema_pipeline.png"),
         _schema_pipeline_tech(directory / "schema_pipeline_tech.png"),
@@ -566,3 +575,277 @@ def _schema_snapshot(path: Path) -> Path:
         size=14,
     )
     return _finish(figure, path)
+
+
+def _problem_map(path: Path) -> Path:
+    """Carte de la province : sites, avis chargés, site de l'entreprise liée.
+
+    Les contours viennent du GeoJSON communal. La teinte compte les sites
+    du CSV. Le contour épais marque une commune d'un avis chargé par les
+    mêmes règles que l'ingestion. Le trait part de cette commune vers un
+    site de l'entreprise liée, quand le lien existe.
+
+    Parameters
+    ----------
+    path :
+        PNG de destination.
+
+    Returns
+    -------
+    Path
+        Le fichier écrit.
+
+    Raises
+    ------
+    ValueError
+        Contour, site ou avis manquant pour un code INS chargé.
+    """
+    features = _boundary_features()
+    site_counts, sites_by_enterprise, enterprises = _site_index()
+    loaded = _loaded_contracts(allowed={item["nis"] for item in features})
+    names = {item["nis"]: item["name"] for item in features}
+    shapes = {item["nis"]: item["rings"] for item in features}
+    missing = {item.nis_code for item in loaded} - set(shapes)
+    if missing:
+        raise ValueError(f"avis chargé sans contour : {sorted(missing)}")
+    links = resolve_winners(
+        [
+            ContractWinner(item.notice_id, item.winner_name, item.enterprise_number)
+            for item in loaded
+        ],
+        enterprises,
+    )
+    by_notice = {item.notice_id: item.nis_code for item in loaded}
+    moves: list[tuple[str, str]] = []
+    for link in links:
+        if link.status != "linked" or not link.enterprise_number:
+            continue
+        origin = by_notice[link.notice_id]
+        for destination in sorted(sites_by_enterprise.get(link.enterprise_number, ())):
+            if destination != origin:
+                moves.append((origin, destination))
+    return _draw_problem_map(path, features, site_counts, names, set(by_notice.values()), moves)
+
+
+def _boundary_features() -> list[dict]:
+    """Lit les communes de Namur. Chaque entrée a un code, un nom, des anneaux."""
+    if not BOUNDARIES_GEOJSON.is_file():
+        raise ValueError(f"contours absents : {BOUNDARIES_GEOJSON}")
+    payload = json.loads(BOUNDARIES_GEOJSON.read_text(encoding="utf-8"))
+    features = payload.get("features")
+    if not isinstance(features, list) or not features:
+        raise ValueError(f"contours vides : {BOUNDARIES_GEOJSON}")
+    parsed: list[dict] = []
+    for feature in features:
+        props = feature.get("properties") or {}
+        nis = str(props.get("nis") or "").strip()
+        name = str(props.get("name") or "").strip()
+        rings = list(_geometry_rings(feature.get("geometry") or {}))
+        if not nis or not name or not rings:
+            raise ValueError(f"contour incomplet : {nis or name}")
+        parsed.append({"nis": nis, "name": name, "rings": rings})
+    return parsed
+
+
+def _geometry_rings(geometry: dict):
+    """Anneaux extérieurs et trous, un polygone à la fois."""
+    kind = geometry.get("type")
+    coordinates = geometry.get("coordinates") or []
+    polygons = [coordinates] if kind == "Polygon" else coordinates
+    if kind not in {"Polygon", "MultiPolygon"}:
+        raise ValueError(f"géométrie inattendue : {kind}")
+    yield from polygons
+
+
+def _site_index() -> tuple[dict[str, int], dict[str, set[str]], list[EnterpriseName]]:
+    """Compte les sites et retient le nom de chaque entreprise du CSV."""
+    counts: dict[str, int] = {}
+    sites_by_enterprise: dict[str, set[str]] = {}
+    enterprises: list[EnterpriseName] = []
+    seen: set[str] = set()
+    with ESTABLISHMENT_SAMPLE.open(encoding="utf-8-sig", newline="") as handle:
+        for raw in csv.DictReader(handle):
+            nis = (raw.get("nis_code") or "").strip()
+            number = (raw.get("enterprise_number") or "").strip()
+            name = (raw.get("enterprise_name") or "").strip()
+            if not nis or not number:
+                continue
+            counts[nis] = counts.get(nis, 0) + 1
+            sites_by_enterprise.setdefault(number, set()).add(nis)
+            if number not in seen:
+                seen.add(number)
+                enterprises.append(EnterpriseName(number, name))
+    if not counts:
+        raise ValueError(f"aucun site : {ESTABLISHMENT_SAMPLE}")
+    return counts, sites_by_enterprise, enterprises
+
+
+def _loaded_contracts(allowed: set[str]):
+    """Avis qui passeraient le chargement, avec les mêmes règles que l'ingestion."""
+    prepared = prepare_contracts(load_notices(), load_cache(), allowed)
+    if not prepared.loaded:
+        raise ValueError("aucun avis chargé pour la carte")
+    return prepared.loaded
+
+
+def _draw_problem_map(
+    path: Path,
+    features: list[dict],
+    site_counts: dict[str, int],
+    names: dict[str, str],
+    contract_nis: set[str],
+    moves: list[tuple[str, str]],
+) -> Path:
+    """Dessine la province. Le trait ne reste pas dans la commune de l'avis."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    largest = max(site_counts.values())
+    scale = LinearSegmentedColormap.from_list("sites", ["#fffaf3", "#e7d7a8", "#8a6a12"])
+    # Format 16:9 : la province à gauche, la légende en grand à droite.
+    figure = plt.figure(figsize=(13.4, 7.4))
+    figure.patch.set_facecolor(_BG)
+    axis = figure.add_axes((0.01, 0.03, 0.64, 0.94))
+    axis.set_facecolor(_BG)
+    centroids: dict[str, tuple[float, float]] = {}
+    for feature in features:
+        nis = feature["nis"]
+        share = 0 if largest == 0 else site_counts.get(nis, 0) / largest
+        color = scale(0.15 + 0.85 * share)
+        awarded = nis in contract_nis
+        for rings in feature["rings"]:
+            patch = PathPatch(
+                _ring_path(rings),
+                facecolor=color,
+                edgecolor=_INK if awarded else "#c9bfb2",
+                linewidth=2.2 if awarded else 0.45,
+                joinstyle="round",
+                zorder=2 if awarded else 1,
+            )
+            axis.add_patch(patch)
+        centroids[nis] = _centroid(feature["rings"][0][0])
+    for origin, destination in moves:
+        start = centroids[origin]
+        end = centroids[destination]
+        axis.annotate(
+            "",
+            xy=end,
+            xytext=start,
+            arrowprops={
+                "arrowstyle": "-|>",
+                "color": _INK,
+                "lw": 0.7,
+                "alpha": 0.85,
+                "shrinkA": 2,
+                "shrinkB": 2,
+                "connectionstyle": "arc3,rad=0.12",
+            },
+            zorder=3,
+        )
+    for nis in sorted(contract_nis):
+        x_pos, y_pos = centroids[nis]
+        axis.text(
+            x_pos,
+            y_pos,
+            names[nis],
+            ha="center",
+            va="center",
+            fontsize=8,
+            color=_INK,
+            zorder=4,
+            path_effects=[path_effects.withStroke(linewidth=3, foreground=_BG)],
+        )
+    axis.set_aspect("equal")
+    axis.autoscale_view()
+    axis.axis("off")
+    axis.margins(0.02)
+    _map_legend(figure, names, contract_nis)
+    figure.savefig(path, dpi=140, facecolor=figure.get_facecolor())
+    plt.close(figure)
+    return path
+
+
+def _map_legend(figure: plt.Figure, names: dict[str, str], contract_nis: set[str]) -> None:
+    """Légende à droite. Les noms restent lisibles quand la carte rétrécit."""
+    ordered = sorted(contract_nis, key=lambda nis: names[nis])
+    listed = "\n".join(names[nis] for nis in ordered)
+    figure.text(
+        0.68,
+        0.92,
+        "Comment lire",
+        color=_INK,
+        fontsize=16,
+        fontweight="bold",
+        ha="left",
+        va="top",
+    )
+    figure.text(
+        0.68,
+        0.82,
+        "Teinte : sites de l'échantillon\n"
+        "Contour noir : un avis chargé\n"
+        "Trait : site de l'entreprise liée,\n"
+        "ailleurs que la commune de l'avis",
+        color=_INK,
+        fontsize=13,
+        ha="left",
+        va="top",
+        linespacing=1.45,
+    )
+    figure.text(
+        0.68,
+        0.52,
+        "Communes des avis chargés",
+        color=_INK,
+        fontsize=16,
+        fontweight="bold",
+        ha="left",
+        va="top",
+    )
+    figure.text(
+        0.68,
+        0.42,
+        listed,
+        color=_INK,
+        fontsize=13,
+        ha="left",
+        va="top",
+        linespacing=1.35,
+    )
+    figure.text(
+        0.68,
+        0.06,
+        "Contours communaux Statbel, 2025.",
+        color=_INK,
+        fontsize=11,
+        ha="left",
+        va="bottom",
+    )
+
+
+def _ring_path(rings: list) -> MplPath:
+    """Un polygone, trous compris. L'anneau suivant est un trou."""
+    vertices: list[tuple[float, float]] = []
+    codes: list[int] = []
+    for ring in rings:
+        if len(ring) < 3:
+            continue
+        points = [(float(x_pos), float(y_pos)) for x_pos, y_pos in ring]
+        if points[0] != points[-1]:
+            points.append(points[0])
+        vertices.append(points[0])
+        codes.append(MplPath.MOVETO)
+        for point in points[1:-1]:
+            vertices.append(point)
+            codes.append(MplPath.LINETO)
+        vertices.append(points[-1])
+        codes.append(MplPath.CLOSEPOLY)
+    return MplPath(vertices, codes)
+
+
+def _centroid(ring: list) -> tuple[float, float]:
+    """Centre moyen de l'anneau extérieur, assez bon pour un nom."""
+    points = ring[:-1] if ring[0] == ring[-1] else ring
+    count = len(points)
+    return (
+        sum(float(point[0]) for point in points) / count,
+        sum(float(point[1]) for point in points) / count,
+    )

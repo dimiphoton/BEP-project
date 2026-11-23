@@ -120,16 +120,17 @@ reapply it: `docker compose down -v`, then `make up`.
 | `make eval-contracts` | Score extracted contract fields and append those calls |
 | `make healthcheck` | Fail if a monitored source is stale or its kept volume drops by more than half |
 | `make metrics` | Rewrite `docs/metrics.json` from the database, dbt and the eval files |
-| `make figures` | Write the charts and the data-model diagrams, then copy them to `docs/slides-assets/` |
+| `make figures` | Write the map, the charts and the data-model diagrams, then copy them to `docs/slides-assets/` |
 | `make dbt-docs` | Generate dbt docs and copy them to `docs/dbt/` |
 | `make slides-check` | Check the French decks against `docs/metrics.json` |
 
 ## Limits of this demo
 
 - Population is real and limited to the Province of Namur. Establishments
-  and notices are synthetic and labelled as such. There is no map: the
-  files have neither outlines nor coordinates. The slide chart keeps the
-  largest municipalities so the names stay readable.
+  and notices are synthetic and labelled as such. The map uses Statbel
+  2025 municipal outlines for those 38 municipalities. Colour and arrows
+  come from the synthetic sample, not from real business parks. The bar
+  chart keeps the largest municipalities so the names stay readable.
 - Agreement scores are not a validated accuracy. The gold labels were not
   reviewed (`label_verified=false`).
 - Invalid rows go to `ops.rejects` for the latest run of that source, not

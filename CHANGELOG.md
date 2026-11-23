@@ -16,3 +16,5 @@
 - Documentation de clôture : README en anglais, limites assumées, suite non faite (Airflow, CDC, alerting). La doc dbt versionnée inclut le mart des avis.
 - Decks FR : but, méthode et chiffres citables. Le texte oral est un commentaire HTML Marp, masqué sur la slide. Decks EN non modifiés.
 - Schémas du trajet, du modèle et de la décision de lien. Population limitée aux communes lisibles. Pas de carte : les sources n'ont ni contour ni coordonnées.
+- Decks FR recentrés sur les fichiers, le calcul, le code et les comptes mesurés. Decks EN non modifiés.
+- Carte de la province de Namur sur les decks FR : contours communaux réels, sites et avis de l'échantillon. Decks EN non modifiés.
