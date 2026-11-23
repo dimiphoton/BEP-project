@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from observatory.dbt_docs import copy_dbt_docs
-from observatory.figures import save_bars
+from observatory.figures import save_bars, write_didactic_figures
 from observatory.metrics import count_dbt_tests
 from observatory.slides import check_deck, french_decks
 
@@ -145,6 +145,17 @@ def test_numbers_come_from_metrics_allowlist_or_years() -> None:
     assert _check(_deck(slides)) == []
 
 
+def test_html_comment_hides_the_spoken_script() -> None:
+    """Le commentaire HTML est le texte oral : ni les mots ni les chiffres n'y comptent."""
+    spoken = " ".join(["mot"] * 80) + " seuil 95 et code 0729."
+    noted = _valid().replace(
+        "Une phrase sans chiffre.",
+        f"Une phrase sans chiffre.\n\n<!--\n{spoken}\n-->",
+        1,
+    )
+    assert _check(noted) == []
+
+
 def test_title_length_and_bullets() -> None:
     """Un libellé, 71 mots ou 7 puces font échouer la slide."""
     titled = _valid().replace("# Une assertion qui tient", "# Résultats", 1)
@@ -184,6 +195,33 @@ def test_dbt_test_counts_ignore_models() -> None:
         ]
     }
     assert count_dbt_tests(payload) == (1, 2)
+
+
+def test_didactic_figures_write_pngs(tmp_path: Path) -> None:
+    """Schémas et population lisible, sans base. Les effectifs viennent du JSON fourni."""
+    sample = tmp_path / "population.csv"
+    sample.write_text(
+        "nis_code,municipality_name,province_nis_code,population,reference_year\n"
+        "92094,Namur,90000,100,2025\n"
+        "92137,Sambreville,90000,40,2025\n",
+        encoding="utf-8",
+    )
+    metrics = {
+        "counts": {"public_contracts": 10},
+        "rejects": {"synthetic_public_contracts": 1},
+        "ai": {
+            "extraction_below_threshold": 1,
+            "extraction_fields_matched": 79,
+            "extraction_fields_scored": 80,
+        },
+    }
+    written = write_didactic_figures(
+        tmp_path / "figures",
+        population_csv=sample,
+        metrics=metrics,
+    )
+    assert len(written) == 11
+    assert all(path.is_file() and path.stat().st_size > 1000 for path in written)
 
 
 def test_save_bars_writes_a_png(tmp_path: Path) -> None:

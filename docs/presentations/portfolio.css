@@ -117,6 +117,12 @@ section.chart {
   padding: 40px 48px 56px;
 }
 
+section.chart h1 {
+  font-size: 1.45em;
+  line-height: 1.1;
+  margin-bottom: 0.2em;
+}
+
 section.chart h2 {
   font-size: 1.25em;
   margin-bottom: 0.2em;
@@ -130,6 +136,9 @@ section.chart p {
 
 section.chart img {
   background: transparent;
+  max-height: 480px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* Reco concrète (« lundi ») */
@@ -192,4 +201,10 @@ section.cta pre {
   background: transparent;
   border: none;
   color: var(--bg);
+}
+
+/* Texte oral : commentaire HTML Marp, rendu en aside.notes.
+   Masqué sur la slide projetée. La vue présentateur relit ce bloc. */
+section aside.notes {
+  display: none;
 }

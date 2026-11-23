@@ -1,23 +1,30 @@
-"""Écrit les PNG de ``pictures/presentations`` depuis les marts."""
+"""Écrit les PNG de ``pictures/presentations`` : schémas, puis barres des marts."""
 
 from __future__ import annotations
 
 import shutil
 from pathlib import Path
 
+from psycopg import Error as PgError
+
 from observatory.config import Settings
 from observatory.db import connect
-from observatory.figures import write_figures
+from observatory.figures import write_didactic_figures, write_figures
 
 PUBLISHED_DIR = Path("docs/slides-assets")
 
 
 def main() -> int:
-    """Dessine les graphiques. 1 si la base est injoignable."""
+    """Dessine schémas et barres. La base absente n'empêche pas les schémas."""
+    written = write_didactic_figures()
     settings = Settings.from_env()
-    settings.require("postgres_password")
-    with connect(settings) as connection:
-        written = write_figures(connection)
+    try:
+        settings.require("postgres_password")
+        with connect(settings) as connection:
+            written.extend(write_figures(connection))
+    except (OSError, PgError) as exc:
+        # La base peut être arrêtée : les schémas, eux, sont déjà dessinés.
+        print(f"barres des marts non rejouées ({exc})")
     PUBLISHED_DIR.mkdir(parents=True, exist_ok=True)
     for path in written:
         shutil.copyfile(path, PUBLISHED_DIR / path.name)
